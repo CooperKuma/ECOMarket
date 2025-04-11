@@ -28,13 +28,7 @@ const RegisterLayout = ({ children }) => {
           </Box>
           <VStack spacing={4} w="full" align="center">
             <Divider borderColor="border.default" />
-            <Text fontSize="sm" color="text.secondary">
-              ¿Ya tienes una cuenta?{" "}
-              <Link href="/login" color="accent.primary" fontWeight="bold">
-                Inicia sesión
-              </Link>
-            </Text>
-            <Box textAlign="center" color="text.secondary" fontSize="xs">
+              <Box textAlign="center" color="text.secondary" fontSize="xs">
               Al registrarte, aceptas nuestros{" "}
               <Link href="/terms" color="accent.primary">
                 Términos y Condiciones

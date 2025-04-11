@@ -1,6 +1,6 @@
 import { Button, VStack, Checkbox, Text, Link, useToast } from "@chakra-ui/react";
 import { useState } from "react";
-import FormField from "../../components/FormField";
+import FormField from "./FormField";
 
 const RegisterForm = () => {
   const [form, setForm] = useState({
@@ -89,12 +89,13 @@ const RegisterForm = () => {
         <Button type="submit" w="full">
           Registrarse
         </Button>
-        <Text fontSize="sm" textAlign="center" color="text.secondary" mt={2}>
-          ¿Ya tienes cuenta?{" "}
-          <Link href="/login" color="accent.primary">
-            Inicia sesión
-          </Link>
-        </Text>
+        <Text fontSize="sm" color="text.secondary" mt={4}
+        >
+                      ¿Ya tienes una cuenta?{" "}
+                      <Link href="/login" color="accent.primary" fontWeight="bold">
+                        Inicia sesión
+                      </Link>
+                    </Text>
       </VStack>
     </form>
   );
