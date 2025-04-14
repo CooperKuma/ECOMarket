@@ -1,5 +1,5 @@
 import { DashboardProvider } from "./context/DashboardContext"
-import DashboardLayout from "./components/layout/DashboardLayout"
+import DashboardLayout from "./common/components/Layout"
 import DashboardRoutes from "./routes/DashboardRoutes"
 
 export default function Dashboard() {
