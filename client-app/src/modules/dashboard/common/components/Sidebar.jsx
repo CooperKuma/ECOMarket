@@ -1,4 +1,6 @@
-import { Box, Flex, VStack, Icon, Text, Divider, useColorModeValue } from "@chakra-ui/react"
+"use client"
+
+import { Box, Flex, VStack, Icon, Text, Divider, useColorModeValue, Button, Badge } from "@chakra-ui/react"
 import { NavLink } from "react-router-dom"
 import {
   FaHome,
@@ -11,10 +13,13 @@ import {
   FaTags,
   FaMoneyBillWave,
   FaCog,
+  FaUsers,
+  FaClipboardList,
+  FaShieldAlt,
 } from "react-icons/fa"
 import { useDashboardContext } from "../../context/DashboardContext"
 
-const NavItem = ({ icon, children, to, isActive }) => {
+const NavItem = ({ icon, children, to, isActive, badge }) => {
   const { sidebarOpen } = useDashboardContext()
   const activeBg = useColorModeValue("brand.primary.100", "brand.primary.900")
   const hoverBg = useColorModeValue("gray.100", "gray.700")
@@ -36,22 +41,38 @@ const NavItem = ({ icon, children, to, isActive }) => {
       bg={isActive ? activeBg : "transparent"}
       color={isActive ? "accent.primary" : "text.primary"}
       fontWeight={isActive ? "bold" : "normal"}
+      position="relative"
     >
       <Icon mr={sidebarOpen ? 4 : 0} fontSize="18" as={icon} />
       <Text opacity={sidebarOpen ? 1 : 0} transition="opacity 0.2s">
         {children}
       </Text>
+      {badge && (
+        <Badge
+          colorScheme="green"
+          position="absolute"
+          right={2}
+          opacity={sidebarOpen ? 1 : 0}
+          transition="opacity 0.2s"
+        >
+          {badge}
+        </Badge>
+      )}
     </Flex>
   )
 }
 
 const Sidebar = () => {
-  const { sidebarOpen, isMobile, userRole } = useDashboardContext()
+  const { sidebarOpen, isMobile, userRole, isAdmin, activeView, toggleActiveView } = useDashboardContext()
   const bgColor = useColorModeValue("white", "gray.800")
   const borderColor = useColorModeValue("gray.200", "gray.700")
+  const adminBgColor = useColorModeValue("orange.50", "gray.700")
 
   // Simular rutas activas para el ejemplo
   const activeRoute = "/dashboard"
+
+  // Determinar qué vista mostrar
+  const viewToShow = isAdmin ? activeView : userRole
 
   return (
     <Box
@@ -74,7 +95,63 @@ const Sidebar = () => {
           Inicio
         </NavItem>
 
-        {userRole === "buyer" ? (
+        {/* Admin View Selector */}
+        {isAdmin && (
+          <Box mx={2} mb={2} p={3} bg={adminBgColor} borderRadius="md" display={sidebarOpen ? "block" : "none"}>
+            <Text fontSize="sm" fontWeight="bold" mb={2}>
+              Vista de Administrador
+            </Text>
+            <Button
+              size="sm"
+              colorScheme={activeView === "buyer" ? "green" : "gray"}
+              mr={2}
+              onClick={() => toggleActiveView()}
+              isActive={activeView === "buyer"}
+            >
+              Comprador
+            </Button>
+            <Button
+              size="sm"
+              colorScheme={activeView === "seller" ? "blue" : "gray"}
+              onClick={() => toggleActiveView()}
+              isActive={activeView === "seller"}
+            >
+              Vendedor
+            </Button>
+          </Box>
+        )}
+
+        {/* Admin Only Section */}
+        {userRole === "admin" && (
+          <>
+            <NavItem
+              icon={FaUsers}
+              to="/dashboard/admin/users"
+              isActive={activeRoute === "/dashboard/admin/users"}
+              badge="New"
+            >
+              Usuarios
+            </NavItem>
+            <NavItem
+              icon={FaClipboardList}
+              to="/dashboard/admin/reports"
+              isActive={activeRoute === "/dashboard/admin/reports"}
+            >
+              Reportes
+            </NavItem>
+            <NavItem
+              icon={FaShieldAlt}
+              to="/dashboard/admin/security"
+              isActive={activeRoute === "/dashboard/admin/security"}
+            >
+              Seguridad
+            </NavItem>
+            <Divider my={2} />
+          </>
+        )}
+
+        {/* Buyer View */}
+        {(viewToShow === "buyer" || viewToShow === "admin") && (
           <>
             <NavItem icon={FaShoppingBag} to="/dashboard/orders" isActive={activeRoute === "/dashboard/orders"}>
               Mis Compras
@@ -86,7 +163,10 @@ const Sidebar = () => {
               Mi Perfil
             </NavItem>
           </>
-        ) : (
+        )}
+
+        {/* Seller View */}
+        {(viewToShow === "seller" || viewToShow === "admin") && (
           <>
             <NavItem icon={FaStore} to="/dashboard/seller/store" isActive={activeRoute === "/dashboard/seller/store"}>
               Mi Tienda
@@ -95,6 +175,7 @@ const Sidebar = () => {
               icon={FaBox}
               to="/dashboard/seller/products"
               isActive={activeRoute === "/dashboard/seller/products"}
+              badge="5"
             >
               Productos
             </NavItem>

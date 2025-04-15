@@ -1,13 +1,15 @@
 "use client"
 
 import { createContext, useContext, useState, useEffect } from "react"
+import { useAuth } from "../../../context/AuthContext"
 
 const DashboardContext = createContext()
 
 export const DashboardProvider = ({ children }) => {
-  const [userRole, setUserRole] = useState("buyer") // 'buyer' o 'seller'
+  const { user } = useAuth()
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [isMobile, setIsMobile] = useState(false)
+  const [activeView, setActiveView] = useState("buyer") // Para administradores que pueden cambiar de vista
 
   // Detectar si es dispositivo móvil
   useEffect(() => {
@@ -29,20 +31,22 @@ export const DashboardProvider = ({ children }) => {
     setSidebarOpen(!sidebarOpen)
   }
 
-  const toggleUserRole = () => {
-    setUserRole(userRole === "buyer" ? "seller" : "buyer")
+  // Función para cambiar la vista activa (solo para administradores)
+  const toggleActiveView = () => {
+    setActiveView(activeView === "buyer" ? "seller" : "buyer")
   }
 
   return (
     <DashboardContext.Provider
       value={{
-        userRole,
-        setUserRole,
-        toggleUserRole,
+        userRole: user?.role || "guest",
+        activeView,
+        toggleActiveView,
         sidebarOpen,
         setSidebarOpen,
         toggleSidebar,
         isMobile,
+        isAdmin: user?.role === "admin",
       }}
     >
       {children}

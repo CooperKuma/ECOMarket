@@ -9,35 +9,69 @@ import {
   FormErrorMessage,
   IconButton,
   VStack,
-  useColorModeValue,
   Text,
   Checkbox,
-  Link
+  Link,
+  useToast
 } from '@chakra-ui/react';
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import { useState } from 'react';
+import { useAuth } from '../../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { useColorModeValue } from '@chakra-ui/react';
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({ email: '', password: '' });
   const [errors, setErrors] = useState({});
+  const toast = useToast();
+  const navigate = useNavigate();
+  const { login } = useAuth();
 
   const accentColor = useColorModeValue('green.600', 'green.300');
+  const inputBg = useColorModeValue('gray.50', 'gray.700');
+
   const togglePassword = () => setShowPassword(!showPassword);
 
-  const handleChange = (e) =>
+  const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+    setErrors({ ...errors, [e.target.name]: '' });
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
     let validationErrors = {};
     if (!form.email) validationErrors.email = 'Correo requerido';
     if (!form.password) validationErrors.password = 'Contraseña requerida';
-    if (Object.keys(validationErrors).length) {
+
+    if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-    } else {
-      console.log('Login:', form);
+      return;
     }
+
+    const res = login(form);
+    if (!res.success) {
+      setErrors({ password: res.message });
+      toast({
+        title: 'Error de autenticación',
+        description: res.message,
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    toast({
+      title: 'Inicio de sesión exitoso',
+      description: `Bienvenido, ${form.email}`,
+      status: 'success',
+      duration: 3000,
+      isClosable: true,
+    });
+
+    navigate('/dashboard');
   };
 
   return (
@@ -51,7 +85,7 @@ const LoginForm = () => {
             value={form.email}
             onChange={handleChange}
             placeholder="ejemplo@correo.com"
-            bg={useColorModeValue('gray.50', 'gray.700')}
+            bg={inputBg}
           />
           <FormErrorMessage>{errors.email}</FormErrorMessage>
         </FormControl>
@@ -65,7 +99,7 @@ const LoginForm = () => {
               value={form.password}
               onChange={handleChange}
               placeholder="********"
-              bg={useColorModeValue('gray.50', 'gray.700')}
+              bg={inputBg}
             />
             <InputRightElement>
               <IconButton

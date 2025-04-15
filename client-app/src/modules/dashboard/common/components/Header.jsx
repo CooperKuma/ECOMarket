@@ -1,98 +1,98 @@
 "use client"
 
 import {
-  Box,
   Flex,
   IconButton,
-  Input,
-  InputGroup,
-  InputLeftElement,
+  Text,
+  useColorModeValue,
   Avatar,
+  Box,
   Menu,
   MenuButton,
   MenuList,
   MenuItem,
-  Button,
+  MenuDivider,
   Badge,
-  useColorMode,
-  useColorModeValue,
-  Text,
-  HStack,
 } from "@chakra-ui/react"
-import { FaBars, FaSearch, FaBell, FaShoppingCart, FaUser, FaMoon, FaSun, FaSignOutAlt } from "react-icons/fa"
+import { FaBars, FaSignOutAlt, FaUser, FaCog } from "react-icons/fa"
 import { useDashboardContext } from "../../context/DashboardContext"
+import { useAuth } from "../../../../context/AuthContext"
 
 const Header = () => {
-  const { toggleSidebar, userRole, toggleUserRole } = useDashboardContext()
-  const { colorMode, toggleColorMode } = useColorMode()
+  const { toggleSidebar, userRole, isAdmin, activeView } = useDashboardContext()
+  const { user, logout } = useAuth()
 
   const bgColor = useColorModeValue("white", "gray.800")
   const borderColor = useColorModeValue("gray.200", "gray.700")
+  const textColor = useColorModeValue("gray.700", "gray.200")
+
+  // Colores para los badges de rol
+  const roleBadgeColors = {
+    admin: "purple",
+    buyer: "green",
+    seller: "blue",
+  }
+
+  // Texto para mostrar en el encabezado según el rol
+  const getRoleDisplayText = () => {
+    if (isAdmin) {
+      return `Panel de Administrador ${activeView ? `(Vista: ${activeView === "buyer" ? "Comprador" : "Vendedor"})` : ""}`
+    } else if (userRole === "buyer") {
+      return "Panel de Comprador"
+    } else if (userRole === "seller") {
+      return "Panel de Vendedor"
+    }
+    return "Dashboard"
+  }
 
   return (
     <Flex
       as="header"
-      align="center"
-      justify="space-between"
-      py={2}
-      px={4}
-      bg={bgColor}
-      borderBottomWidth="1px"
-      borderColor={borderColor}
-      position="sticky"
+      position="fixed"
       top="0"
+      width="100%"
+      height="60px"
       zIndex="1000"
+      bg={bgColor}
+      borderBottom="1px"
+      borderColor={borderColor}
+      align="center"
+      px={4}
     >
-      <Flex align="center">
-        <IconButton aria-label="Menu" icon={<FaBars />} variant="ghost" onClick={toggleSidebar} mr={4} />
-        <Text fontSize="xl" fontWeight="bold" color="accent.primary" display={{ base: "none", md: "block" }}>
-          MiMarketplace
-        </Text>
-      </Flex>
+      <IconButton aria-label="Abrir menú" icon={<FaBars />} variant="ghost" onClick={toggleSidebar} mr={4} />
 
-      <InputGroup maxW="500px" mx={4} display={{ base: "none", md: "block" }}>
-        <InputLeftElement pointerEvents="none">
-          <FaSearch color="gray.300" />
-        </InputLeftElement>
-        <Input placeholder="Buscar productos, marcas y más..." borderRadius="full" />
-      </InputGroup>
+      <Text fontSize="lg" fontWeight="bold" color={textColor}>
+        {getRoleDisplayText()}
+      </Text>
 
-      <HStack spacing={3}>
-        <Button size="sm" colorScheme={userRole === "seller" ? "orange" : "blue"} onClick={toggleUserRole}>
-          {userRole === "buyer" ? "Cambiar a Vendedor" : "Cambiar a Comprador"}
-        </Button>
+      <Box ml="auto" display="flex" alignItems="center">
+        {user && (
+          <>
+            <Badge colorScheme={roleBadgeColors[userRole]} mr={4}>
+              {userRole.charAt(0).toUpperCase() + userRole.slice(1)}
+            </Badge>
 
-        <IconButton
-          aria-label={colorMode === "light" ? "Modo oscuro" : "Modo claro"}
-          icon={colorMode === "light" ? <FaMoon /> : <FaSun />}
-          variant="ghost"
-          onClick={toggleColorMode}
-        />
-
-        <Box position="relative" display={{ base: "none", sm: "block" }}>
-          <IconButton aria-label="Notificaciones" icon={<FaBell />} variant="ghost" />
-          <Badge position="absolute" top="-1" right="-1" colorScheme="red" borderRadius="full" fontSize="xs">
-            3
-          </Badge>
-        </Box>
-
-        <Box position="relative" display={{ base: "none", sm: "block" }}>
-          <IconButton aria-label="Carrito" icon={<FaShoppingCart />} variant="ghost" />
-          <Badge position="absolute" top="-1" right="-1" colorScheme="green" borderRadius="full" fontSize="xs">
-            2
-          </Badge>
-        </Box>
-
-        <Menu>
-          <MenuButton>
-            <Avatar size="sm" name="Usuario" src="https://bit.ly/broken-link" />
-          </MenuButton>
-          <MenuList>
-            <MenuItem icon={<FaUser />}>Mi perfil</MenuItem>
-            <MenuItem icon={<FaSignOutAlt />}>Cerrar sesión</MenuItem>
-          </MenuList>
-        </Menu>
-      </HStack>
+            <Menu>
+              <MenuButton>
+                <Flex align="center">
+                  <Text mr={2} display={{ base: "none", md: "block" }}>
+                    {user.name}
+                  </Text>
+                  <Avatar size="sm" name={user.name} />
+                </Flex>
+              </MenuButton>
+              <MenuList>
+                <MenuItem icon={<FaUser />}>Perfil</MenuItem>
+                <MenuItem icon={<FaCog />}>Configuración</MenuItem>
+                <MenuDivider />
+                <MenuItem icon={<FaSignOutAlt />} onClick={logout}>
+                  Cerrar sesión
+                </MenuItem>
+              </MenuList>
+            </Menu>
+          </>
+        )}
+      </Box>
     </Flex>
   )
 }

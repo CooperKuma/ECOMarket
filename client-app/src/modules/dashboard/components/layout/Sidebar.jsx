@@ -1,4 +1,4 @@
-import { Box, Flex, VStack, Icon, Text, Divider, useColorModeValue } from "@chakra-ui/react"
+import { Box, Flex, VStack, Icon, Text, Divider, useColorModeValue, Button } from "@chakra-ui/react"
 import { NavLink } from "react-router-dom"
 import {
   FaHome,
@@ -46,9 +46,10 @@ const NavItem = ({ icon, children, to, isActive }) => {
 }
 
 const Sidebar = () => {
-  const { sidebarOpen, isMobile, userRole } = useDashboardContext()
+  const { sidebarOpen, isMobile, userRole, isAdmin, activeView, toggleActiveView } = useDashboardContext()
   const bgColor = useColorModeValue("white", "gray.800")
   const borderColor = useColorModeValue("gray.200", "gray.700")
+  const viewToShow = isAdmin ? activeView : userRole
 
   // Simular rutas activas para el ejemplo
   const activeRoute = "/dashboard"
@@ -70,11 +71,38 @@ const Sidebar = () => {
       display={isMobile && !sidebarOpen ? "none" : "block"}
     >
       <VStack align="stretch" spacing={1} py={4}>
+        {/* Selector de vista para admin */}
+        {isAdmin && (
+          <Box mx={2} mb={2} p={3} bg="orange.50" borderRadius="md" display={sidebarOpen ? "block" : "none"}>
+            <Text fontSize="sm" fontWeight="bold" mb={2}>
+              Vista de Administrador
+            </Text>
+            <Button
+              size="sm"
+              colorScheme={activeView === "buyer" ? "green" : "gray"}
+              mr={2}
+              onClick={() => toggleActiveView()}
+              isActive={activeView === "buyer"}
+            >
+              Comprador
+            </Button>
+            <Button
+              size="sm"
+              colorScheme={activeView === "seller" ? "blue" : "gray"}
+              onClick={() => toggleActiveView()}
+              isActive={activeView === "seller"}
+            >
+              Vendedor
+            </Button>
+          </Box>
+        )}
+
         <NavItem icon={FaHome} to="/dashboard" isActive={activeRoute === "/dashboard"}>
           Inicio
         </NavItem>
 
-        {userRole === "buyer" ? (
+        {/* Menú Buyer */}
+        {viewToShow === "buyer" && (
           <>
             <NavItem icon={FaShoppingBag} to="/dashboard/orders" isActive={activeRoute === "/dashboard/orders"}>
               Mis Compras
@@ -86,7 +114,10 @@ const Sidebar = () => {
               Mi Perfil
             </NavItem>
           </>
-        ) : (
+        )}
+
+        {/* Menú Seller */}
+        {viewToShow === "seller" && (
           <>
             <NavItem icon={FaStore} to="/dashboard/seller/store" isActive={activeRoute === "/dashboard/seller/store"}>
               Mi Tienda

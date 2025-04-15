@@ -1,6 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom"
 import { useDashboardContext } from "../context/DashboardContext"
-import { useState } from "react";
 
 // Páginas de comprador
 import BuyerDashboard from "../features/buyer-dashboard/pages/BuyerDashboard"
@@ -23,8 +22,7 @@ import Finances from "../pages/seller/Finances"
 import Settings from "../pages/common/Settings"
 
 const DashboardRoutes = () => {
- // const { userRole } = useDashboardContext()
- const [userRole, setUserRole] = useState("seller");
+  const { userRole } = useDashboardContext()
 
   return (
     <Routes>
@@ -47,7 +45,7 @@ const DashboardRoutes = () => {
       <Route path="/seller/finances" element={<Finances />} />
 
       {/* Configuración (común) */}
-      {/*<Route path="/settings" element={<Settings />} />
+      <Route path="/settings" element={<Settings />} />
 
       {/* Redirección para rutas no encontradas */}
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
