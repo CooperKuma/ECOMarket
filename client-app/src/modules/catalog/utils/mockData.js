@@ -9,7 +9,7 @@ export const mockProducts = Array(24)
     originalPrice: Math.random() > 0.5 ? Math.floor(Math.random() * 60000) + 10000 : null,
     rating: (Math.random() * 2 + 3).toFixed(1),
     reviews: Math.floor(Math.random() * 500),
-    image: `/placeholder.svg?height=300&width=300`,
+    image: `https://blog.ucsp.edu.pe/hs-fs/hubfs/Inbound-Pregrado/electronica-digital.jpg?width=2251&height=1061&name=electronica-digital.jpg`,
     freeShipping: Math.random() > 0.5,
     stock: Math.floor(Math.random() * 100),
     seller: `Vendedor ${Math.floor(Math.random() * 10) + 1}`,

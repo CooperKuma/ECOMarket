@@ -31,6 +31,8 @@ import {
   Badge,
   Container,
   HStack,
+  Divider,
+  SimpleGrid,
 } from "@chakra-ui/react"
 import {
   FaBars,
@@ -43,26 +45,26 @@ import {
   FaSignInAlt,
   FaMoon,
   FaSun,
-  FaBell,
-  FaHeart,
+  FaHome,
   FaQuestionCircle,
   FaHeadset,
   FaLaptop,
   FaMobile,
   FaTshirt,
-  FaHome,
   FaGamepad,
   FaBook,
   FaBabyCarriage,
   FaCar,
+  FaInfoCircle,
 } from "react-icons/fa"
+import { useAuth } from "../context/AuthContext" // Asumiendo que tienes un AuthContext
 
 const Navbar = () => {
   const { isOpen, onToggle } = useDisclosure()
   const { colorMode, toggleColorMode } = useColorMode()
   const location = useLocation()
   const [isScrolled, setIsScrolled] = useState(false)
-  const [isLoggedIn, setIsLoggedIn] = useState(false) // Simulación de estado de login
+  const { user, isAuthenticated, logout } = useAuth() // Usando el AuthContext
 
   // Detectar scroll para cambiar estilo del navbar
   useEffect(() => {
@@ -83,9 +85,9 @@ const Navbar = () => {
     isScrolled ? "white" : "rgba(255, 255, 255, 0.8)",
     isScrolled ? "gray.800" : "rgba(26, 32, 44, 0.8)",
   )
-  const textColor = useColorModeValue("gray.600", "gray.200")
-  const borderColor = useColorModeValue("gray.200", "gray.700")
-  const hoverBgColor = useColorModeValue("gray.50", "gray.700")
+  const textColor = useColorModeValue("text.primary", "text.primary")
+  const borderColor = useColorModeValue("border.default", "border.default")
+  const searchBgColor = useColorModeValue("bg.surface", "bg.surface")
 
   return (
     <Box
@@ -101,7 +103,8 @@ const Navbar = () => {
       boxShadow={isScrolled ? "sm" : "none"}
     >
       <Container maxW="1400px">
-        <Flex py={{ base: 2, md: 4 }} px={{ base: 4, md: 0 }} align="center">
+        {/* Top Navigation Bar */}
+        <Flex py={{ base: 2, md: 3 }} px={{ base: 4, md: 0 }} align="center">
           {/* Logo */}
           <Flex flex={{ base: 1 }} justify={{ base: "start", md: "start" }}>
             <Text
@@ -111,9 +114,9 @@ const Navbar = () => {
               fontFamily="heading"
               fontWeight="bold"
               fontSize="xl"
-              color={useColorModeValue("orange.500", "orange.300")}
+              color="accent.primary"
             >
-              MiMarketplace
+              EcoMarket
             </Text>
 
             {/* Desktop Navigation */}
@@ -121,14 +124,6 @@ const Navbar = () => {
               <DesktopNav />
             </Flex>
           </Flex>
-
-          {/* Search Bar - Desktop */}
-          <InputGroup maxW="400px" mx={4} display={{ base: "none", lg: "block" }}>
-            <InputLeftElement pointerEvents="none">
-              <FaSearch color="gray.300" />
-            </InputLeftElement>
-            <Input placeholder="Buscar productos, marcas y más..." borderRadius="full" />
-          </InputGroup>
 
           {/* Right Side Icons */}
           <Stack
@@ -149,16 +144,16 @@ const Navbar = () => {
             {/* Cart */}
             <Box position="relative" display={{ base: "none", sm: "block" }}>
               <IconButton as={RouterLink} to="/cart" aria-label="Carrito" icon={<FaShoppingCart />} variant="ghost" />
-              <Badge position="absolute" top="-1" right="-1" colorScheme="green" borderRadius="full" fontSize="xs">
+              <Badge position="absolute" top="-1" right="-1" colorScheme="blue" borderRadius="full" fontSize="xs">
                 2
               </Badge>
             </Box>
 
-          {/* User Menu */}
-            {isLoggedIn ? (
+            {/* User Menu */}
+            {isAuthenticated ? (
               <Menu>
                 <MenuButton as={Button} rounded="full" variant="link" cursor="pointer" minW={0}>
-                  <Avatar size="sm" src="https://bit.ly/broken-link" />
+                  <Avatar size="sm" src="https://bit.ly/broken-link" name={user?.name} />
                 </MenuButton>
                 <MenuList zIndex={1001}>
                   <MenuItem as={RouterLink} to="/dashboard" icon={<FaUser />}>
@@ -168,7 +163,7 @@ const Navbar = () => {
                     Mis compras
                   </MenuItem>
                   <MenuDivider />
-                  <MenuItem onClick={() => setIsLoggedIn(false)}>Cerrar sesión</MenuItem>
+                  <MenuItem onClick={logout}>Cerrar sesión</MenuItem>
                 </MenuList>
               </Menu>
             ) : (
@@ -178,7 +173,7 @@ const Navbar = () => {
                 display={{ base: "none", md: "inline-flex" }}
                 fontSize="sm"
                 fontWeight={600}
-                colorScheme="orange"
+                colorScheme="blue"
                 leftIcon={<FaSignInAlt />}
               >
                 Ingresar
@@ -196,8 +191,135 @@ const Navbar = () => {
           </Stack>
         </Flex>
 
-        {/* Search Bar - Mobile */}
-        <Box pb={2} display={{ base: "block", lg: "none" }} px={4}>
+        {/* Divider between top and bottom navbar */}
+        <Divider display={{ base: "none", md: "block" }} borderColor={borderColor} />
+
+        {/* Bottom Navigation Bar - Search */}
+        <Flex
+          py={3}
+          px={{ base: 4, md: 0 }}
+          display={{ base: "none", md: "flex" }}
+          justify="space-between"
+          align="center"
+        >
+          {/* Categories Menu */}
+          <Popover trigger="hover" placement="bottom-start">
+            <PopoverTrigger>
+              <Button rightIcon={<FaChevronDown />} colorScheme="blue" variant="ghost" fontWeight={500}>
+                Categorías
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent
+              border={0}
+              boxShadow="xl"
+              bg={useColorModeValue("bg.card", "bg.card")}
+              p={4}
+              rounded="xl"
+              minW="sm"
+            >
+              <SimpleGrid columns={2} spacing={2}>
+                <CategoryItem icon={FaLaptop} label="Electrónica" href="/catalog/electronics" />
+                <CategoryItem icon={FaMobile} label="Celulares" href="/catalog/mobile" />
+                <CategoryItem icon={FaTshirt} label="Moda" href="/catalog/fashion" />
+                <CategoryItem icon={FaHome} label="Hogar" href="/catalog/home" />
+                <CategoryItem icon={FaGamepad} label="Videojuegos" href="/catalog/gaming" />
+                <CategoryItem icon={FaBook} label="Libros" href="/catalog/books" />
+                <CategoryItem icon={FaBabyCarriage} label="Bebés" href="/catalog/kids" />
+                <CategoryItem icon={FaCar} label="Vehículos" href="/catalog/vehicles" />
+              </SimpleGrid>
+            </PopoverContent>
+          </Popover>
+
+          {/* Search Bar */}
+          <InputGroup size="md" maxW="600px" mx={4} flex={1}>
+            <InputLeftElement pointerEvents="none">
+              <FaSearch color="gray.300" />
+            </InputLeftElement>
+            <Input
+              placeholder="Buscar productos, marcas y más..."
+              borderRadius="full"
+              bg={searchBgColor}
+              _focus={{
+                borderColor: "brand.primary.400",
+                boxShadow: "0 0 0 1px var(--chakra-colors-brand-primary-400)",
+              }}
+            />
+          </InputGroup>
+
+          {/* Quick Links */}
+          <Popover trigger="hover" placement="bottom-end">
+            <PopoverTrigger>
+              <Button rightIcon={<FaChevronDown />} colorScheme="blue" variant="ghost" fontWeight={500}>
+                <HStack>
+                  <Icon as={FaQuestionCircle} />
+                  <Text>Ayuda</Text>
+                </HStack>
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent
+              border={0}
+              boxShadow="xl"
+              bg={useColorModeValue("bg.card", "bg.card")}
+              p={4}
+              rounded="xl"
+              minW="sm"
+            >
+              <Stack spacing={3}>
+                <Link as={RouterLink} to="/support" _hover={{ textDecoration: "none" }}>
+                  <HStack
+                    spacing={3}
+                    p={2}
+                    rounded="md"
+                    _hover={{ bg: useColorModeValue("brand.primary.50", "gray.700") }}
+                  >
+                    <Icon as={FaHeadset} color="accent.primary" boxSize={5} />
+                    <Box>
+                      <Text fontWeight={600}>Centro de Ayuda</Text>
+                      <Text fontSize="sm" color="text.secondary">
+                        Encuentra soluciones a problemas comunes
+                      </Text>
+                    </Box>
+                  </HStack>
+                </Link>
+                <Link as={RouterLink} to="/support/faq" _hover={{ textDecoration: "none" }}>
+                  <HStack
+                    spacing={3}
+                    p={2}
+                    rounded="md"
+                    _hover={{ bg: useColorModeValue("brand.primary.50", "gray.700") }}
+                  >
+                    <Icon as={FaQuestionCircle} color="accent.primary" boxSize={5} />
+                    <Box>
+                      <Text fontWeight={600}>Preguntas Frecuentes</Text>
+                      <Text fontSize="sm" color="text.secondary">
+                        Respuestas a las dudas más comunes
+                      </Text>
+                    </Box>
+                  </HStack>
+                </Link>
+                <Link as={RouterLink} to="/contact" _hover={{ textDecoration: "none" }}>
+                  <HStack
+                    spacing={3}
+                    p={2}
+                    rounded="md"
+                    _hover={{ bg: useColorModeValue("brand.primary.50", "gray.700") }}
+                  >
+                    <Icon as={FaHeadset} color="accent.primary" boxSize={5} />
+                    <Box>
+                      <Text fontWeight={600}>Contacto</Text>
+                      <Text fontSize="sm" color="text.secondary">
+                        Comunícate con nuestro equipo
+                      </Text>
+                    </Box>
+                  </HStack>
+                </Link>
+              </Stack>
+            </PopoverContent>
+          </Popover>
+        </Flex>
+
+        {/* Mobile Search Bar */}
+        <Box pb={2} display={{ base: "block", md: "none" }} px={4}>
           <InputGroup>
             <InputLeftElement pointerEvents="none">
               <FaSearch color="gray.300" />
@@ -216,51 +338,56 @@ const Navbar = () => {
 }
 
 const DesktopNav = () => {
-  const linkColor = useColorModeValue("gray.600", "gray.200")
-  const linkHoverColor = useColorModeValue("orange.500", "orange.300")
-  const popoverContentBgColor = useColorModeValue("white", "gray.800")
+  const linkColor = useColorModeValue("text.primary", "text.primary")
+  const linkHoverColor = useColorModeValue("accent.primary", "brand.primary.300")
   const location = useLocation()
 
   return (
     <Stack direction="row" spacing={4}>
-      {NAV_ITEMS.map((navItem) => (
-        <Box key={navItem.label}>
-          <Popover trigger="hover" placement="bottom-start">
-            <PopoverTrigger>
-              <Link
-                as={RouterLink}
-                p={2}
-                to={navItem.href ?? "#"}
-                fontSize="sm"
-                fontWeight={500}
-                color={linkColor}
-                _hover={{
-                  textDecoration: "none",
-                  color: linkHoverColor,
-                }}
-                _activeLink={{
-                  color: linkHoverColor,
-                  fontWeight: 600,
-                }}
-                isActive={location.pathname === navItem.href}
-              >
-                {navItem.label}
-                {navItem.children && <Icon as={FaChevronDown} h={3} w={3} ml={1} transition="all .25s ease-in-out" />}
-              </Link>
-            </PopoverTrigger>
-
-            {navItem.children && (
-              <PopoverContent border={0} boxShadow="xl" bg={popoverContentBgColor} p={4} rounded="xl" minW="sm">
-                <Stack>
-                  {navItem.children.map((child) => (
-                    <DesktopSubNav key={child.label} {...child} />
-                  ))}
-                </Stack>
-              </PopoverContent>
-            )}
-          </Popover>
-        </Box>
-      ))}
+      <Link
+        as={RouterLink}
+        p={2}
+        to="/"
+        fontSize="sm"
+        fontWeight={500}
+        color={linkColor}
+        _hover={{
+          textDecoration: "none",
+          color: linkHoverColor,
+        }}
+        _activeLink={{
+          color: linkHoverColor,
+          fontWeight: 600,
+        }}
+        isActive={location.pathname === "/"}
+      >
+        <HStack spacing={1}>
+          <Icon as={FaHome} />
+          <Text>Inicio</Text>
+        </HStack>
+      </Link>
+      <Link
+        as={RouterLink}
+        p={2}
+        to="/about"
+        fontSize="sm"
+        fontWeight={500}
+        color={linkColor}
+        _hover={{
+          textDecoration: "none",
+          color: linkHoverColor,
+        }}
+        _activeLink={{
+          color: linkHoverColor,
+          fontWeight: 600,
+        }}
+        isActive={location.pathname === "/about"}
+      >
+        <HStack spacing={1}>
+          <Icon as={FaInfoCircle} />
+          <Text>Nosotros</Text>
+        </HStack>
+      </Link>
     </Stack>
   )
 }
@@ -274,17 +401,19 @@ const DesktopSubNav = ({ label, href, subLabel, icon }) => {
       display="block"
       p={2}
       rounded="md"
-      _hover={{ bg: useColorModeValue("orange.50", "gray.900") }}
+      _hover={{ bg: useColorModeValue("brand.primary.50", "gray.900") }}
     >
       <Stack direction="row" align="center">
         <Box>
           <HStack>
-            {icon && <Icon as={icon} color="orange.400" />}
-            <Text transition="all .3s ease" _groupHover={{ color: "orange.400" }} fontWeight={500}>
+            {icon && <Icon as={icon} color="accent.primary" />}
+            <Text transition="all .3s ease" _groupHover={{ color: "accent.primary" }} fontWeight={500}>
               {label}
             </Text>
           </HStack>
-          <Text fontSize="sm">{subLabel}</Text>
+          <Text fontSize="sm" color="text.secondary">
+            {subLabel}
+          </Text>
         </Box>
         <Flex
           transition="all .3s ease"
@@ -295,21 +424,61 @@ const DesktopSubNav = ({ label, href, subLabel, icon }) => {
           align="center"
           flex={1}
         >
-          <Icon color="orange.400" w={5} h={5} as={FaChevronRight} />
+          <Icon color="accent.primary" w={5} h={5} as={FaChevronRight} />
         </Flex>
       </Stack>
     </Link>
   )
 }
 
+const CategoryItem = ({ icon, label, href }) => {
+  return (
+    <Link
+      as={RouterLink}
+      to={href}
+      role="group"
+      display="block"
+      p={2}
+      rounded="md"
+      _hover={{ bg: useColorModeValue("brand.primary.50", "gray.900") }}
+    >
+      <HStack>
+        <Icon as={icon} color="accent.primary" />
+        <Text>{label}</Text>
+      </HStack>
+    </Link>
+  )
+}
+
 const MobileNav = () => {
   return (
-    <Stack bg={useColorModeValue("white", "gray.800")} p={4} display={{ md: "none" }}>
+    <Stack bg={useColorModeValue("bg.card", "bg.card")} p={4} display={{ md: "none" }}>
       {NAV_ITEMS.map((navItem) => (
         <MobileNavItem key={navItem.label} {...navItem} />
       ))}
+      <MobileNavItem
+        label="Ayuda"
+        icon={FaQuestionCircle}
+        children={[
+          {
+            label: "Centro de Ayuda",
+            href: "/support",
+            icon: FaHeadset,
+          },
+          {
+            label: "Preguntas Frecuentes",
+            href: "/support/faq",
+            icon: FaQuestionCircle,
+          },
+          {
+            label: "Contacto",
+            href: "/contact",
+            icon: FaHeadset,
+          },
+        ]}
+      />
       <Box pt={4}>
-        <Button as={RouterLink} to="/login" w="full" colorScheme="orange" leftIcon={<FaSignInAlt />}>
+        <Button as={RouterLink} to="/login" w="full" colorScheme="blue" leftIcon={<FaSignInAlt />}>
           Ingresar
         </Button>
       </Box>
@@ -317,7 +486,7 @@ const MobileNav = () => {
   )
 }
 
-const MobileNavItem = ({ label, children, href }) => {
+const MobileNavItem = ({ label, children, href, icon }) => {
   const { isOpen, onToggle } = useDisclosure()
 
   return (
@@ -332,9 +501,12 @@ const MobileNavItem = ({ label, children, href }) => {
           textDecoration: "none",
         }}
       >
-        <Text fontWeight={600} color={useColorModeValue("gray.600", "gray.200")}>
-          {label}
-        </Text>
+        <HStack>
+          {icon && <Icon as={icon} color="accent.primary" />}
+          <Text fontWeight={600} color={useColorModeValue("text.primary", "text.primary")}>
+            {label}
+          </Text>
+        </HStack>
         {children && (
           <Icon
             as={FaChevronDown}
@@ -352,13 +524,16 @@ const MobileNavItem = ({ label, children, href }) => {
           pl={4}
           borderLeft={1}
           borderStyle="solid"
-          borderColor={useColorModeValue("gray.200", "gray.700")}
+          borderColor={useColorModeValue("border.default", "border.default")}
           align="start"
         >
           {children &&
             children.map((child) => (
               <Link key={child.label} py={2} as={RouterLink} to={child.href} fontWeight={500}>
-                {child.label}
+                <HStack>
+                  {child.icon && <Icon as={child.icon} color="accent.primary" />}
+                  <Text>{child.label}</Text>
+                </HStack>
               </Link>
             ))}
         </Stack>
@@ -372,91 +547,13 @@ const NAV_ITEMS = [
   {
     label: "Inicio",
     href: "/",
-  },
-  
-    {
-    label: "Categorías",
-    children: [
-      {
-        label: "Electrónica",
-        subLabel: "Smartphones, laptops, accesorios",
-        href: "/catalog/electronics",
-        icon: FaLaptop,
-      },
-      {
-        label: "Celulares",
-        subLabel: "Smartphones, accesorios, smartwatches",
-        href: "/catalog/mobile",
-        icon: FaMobile,
-      },
-      {
-        label: "Moda",
-        subLabel: "Ropa, calzado, accesorios",
-        href: "/catalog/fashion",
-        icon: FaTshirt,
-      },
-      {
-        label: "Hogar y Jardín",
-        subLabel: "Muebles, decoración, herramientas",
-        href: "/catalog/home",
-        icon: FaHome,
-      },
-      {
-        label: "Videojuegos",
-        subLabel: "Consolas, juegos, accesorios",
-        href: "/catalog/gaming",
-        icon: FaGamepad,
-      },
-      {
-        label: "Libros y Música",
-        subLabel: "Libros, eBooks, instrumentos",
-        href: "/catalog/books",
-        icon: FaBook,
-      },
-      {
-        label: "Bebés y Niños",
-        subLabel: "Juguetes, ropa, accesorios",
-        href: "/catalog/kids",
-        icon: FaBabyCarriage,
-      },
-      {
-        label: "Vehículos",
-        subLabel: "Autos, motos, repuestos",
-        href: "/catalog/vehicles",
-        icon: FaCar,
-      },
-      {
-        label: "Ver todas",
-        href: "/catalog/all",
-        icon: FaSearch,
-      },
-    ],
+    icon: FaHome,
   },
   {
-    label: "Ayuda",
-    children: [
-      {
-        label: "Centro de Ayuda",
-        href: "/support",
-        icon: FaHeadset,
-      },
-      {
-        label: "Preguntas Frecuentes",
-        href: "/support/faq",
-        icon: FaQuestionCircle,
-      },
-      {
-        label: "Contacto",
-        href: "/contact",
-        icon: FaHeadset,
-      },
-    ],
-  },
-  {
-    label: "Sobre nosotros",
+    label: "Nosotros",
     href: "/about",
-  }
-
+    icon: FaInfoCircle,
+  },
 ]
 
 export default Navbar

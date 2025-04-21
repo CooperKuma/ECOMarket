@@ -1,33 +1,49 @@
 // src/context/AuthContext.jsx
-import { createContext, useContext, useState } from "react";
-import users from "../utils/userData";
+import React, { createContext, useContext, useState } from "react";
+import * as authService from "../modules/auth/services/authService";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
-  const login = ({ email, password }) => {
-    const foundUser = users.find(
-      (u) => u.email === email && u.password === password
-    );
-    if (foundUser) {
-      setUser(foundUser);
+  const login = async ({ email, password }) => {
+    try {
+      const data = await authService.login(email, password);
+      setUser(data);
+      localStorage.setItem("token", data.token);
       return { success: true };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || "Error al iniciar sesión",
+      };
     }
-    return { success: false, message: "Credenciales inválidas" };
   };
 
-  const logout = () => setUser(null);
+  const register = async (form) => {
+    try {
+      const data = await authService.register(form);
+      // Opcional: setUser(data); // Si quieres loguear automáticamente tras registro
+      return { success: true };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || "Error al registrar usuario",
+      };
+    }
+  };
 
-  const isAuthenticated = !!user;
+  const logout = () => {
+    setUser(null);
+    localStorage.removeItem("token");
+  };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isAuthenticated }}>
+    <AuthContext.Provider value={{ user, login, logout, register }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-// Hook personalizado para usar AuthContext
 export const useAuth = () => useContext(AuthContext);

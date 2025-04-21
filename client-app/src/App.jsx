@@ -9,7 +9,10 @@ import CatalogPage from "./modules/catalog/pages/CatalogPage";
 import ProductDetailPage from "./modules/product-detail/pages/ProductDetailPage"
 import ContactPage from "./modules/contact/pages/ContactPage";
 import SupportPage from "./modules/support/components/ContactOptions";
-import { CartPage } from "./modules/cart"
+import FaqAccordion from "./modules/support/pages/FaqPage";
+import AboutPage from "./modules/about/pages/AboutPage";
+import CartPage from "./modules/cart/pages/CartPage";
+import RecoveryPasswordpage  from "./modules/auth/pages/RecoveryPasswordPage";
 
 function App() {
   return (
@@ -23,12 +26,16 @@ function App() {
       <Route path="/contact" element={<ContactPage />} />
       <Route path="/support" element={<SupportPage />} />
       <Route path="/offers" element={<CatalogPage />} />
+      <Route path="/support/faq" element={<FaqAccordion />} />
+      <Route path="/about" element={<AboutPage />} />
+      
     </Route>
 
     {/* Dashboard: layout independiente */}
     <Route path="/dashboard/*" element={<Dashboard />} />
     <Route path="/login" element={<LoginPage />} />
     <Route path="/register" element={<RegisterPage />} />
+    <Route path="/recovery-password" element={<RecoveryPasswordpage />} />
   </Routes>
   );
 }
