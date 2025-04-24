@@ -12,22 +12,13 @@ com.ecomarket.backend
 ├── config                 # Configuraciones generales (CORS, beans, Swagger, etc.)
 ├── security              # Seguridad (JWT, filtros, autenticación)
 ├── common                # Utilidades compartidas y manejo centralizado de errores
-├── features              # Módulos del dominio, organizados por feature
-│   ├── address
-│   ├── frequent_account
-│   ├── loyalty_points
-│   ├── product
-│   ├── promotion
-│   ├── state
-│   ├── transaction
+├── features              # Módulos del dominio, organizados por feature 
 │   ├── user
 │   ├── user_role
-│   ├── point_history
-│   ├── role
-│   ├── card
-│   ├── activity_log
-│   ├── backup_log
-│   └── user_promotion
+│   └── role
+
+  
+
 ```
 
 ---
