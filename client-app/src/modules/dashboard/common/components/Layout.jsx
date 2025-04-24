@@ -1,30 +1,37 @@
 import { Box, Flex } from "@chakra-ui/react"
-import Sidebar from "./Sidebar"
 import Header from "./Header"
+import Sidebar from "./Sidebar"
+import { useAuth } from "../../../auth/hooks/useAuth"
+import { Navigate } from "react-router-dom"
 import { useDashboardContext } from "../../context/DashboardContext"
 
-const DashboardLayout = ({ children }) => {
+const Layout = ({ children }) => {
+  const { auth } = useAuth()
   const { sidebarOpen, isMobile } = useDashboardContext()
+  
+  if (!auth) {
+    return <Navigate to="/login" replace />
+  }
 
   return (
-    <Flex h="100vh" flexDirection="column">
+    <Box minH="100vh">
       <Header />
-      <Flex flex="1" overflow="hidden">
+      <Flex position="relative">
         <Sidebar />
         <Box
-          as="main"
           flex="1"
-          p={4}
-          ml={isMobile ? 0 : sidebarOpen ? "250px" : "80px"}
+          ml={{ base: 0, md: sidebarOpen ? "250px" : "70px" }}
+          p={6}
+          mt="60px"
+          bg="bg.default"
+          minH="calc(100vh - 60px)"
           transition="margin-left 0.3s"
-          overflowY="auto"
-          bg="bg.surface"
         >
           {children}
         </Box>
       </Flex>
-    </Flex>
+    </Box>
   )
 }
 
-export default DashboardLayout
+export default Layout

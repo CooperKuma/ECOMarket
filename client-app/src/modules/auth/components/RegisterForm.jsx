@@ -18,7 +18,7 @@ import {
 } from "@chakra-ui/react"
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons"
 import { useState } from "react"
-import { useAuth } from "../../../context/AuthContext"
+import { useAuth } from "../../auth/hooks/useAuth.js"
 import { useNavigate } from "react-router-dom"
 import { useColorModeValue } from "@chakra-ui/react"
 

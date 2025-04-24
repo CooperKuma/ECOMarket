@@ -2,11 +2,14 @@ import { Box, Heading, SimpleGrid } from "@chakra-ui/react"
 import StatCards from "../components/StatCards"
 import RecentOrdersTable from "../components/RecentOrdersTable"
 import FavoritesPreview from "../components/FavoritesPreview"
+import { useAuth } from "../../../../auth/hooks/useAuth"
 
 const BuyerDashboard = () => {
+  const { auth } = useAuth()
+
   return (
     <Box>
-      <Heading mb={6}>Bienvenido a tu Dashboard</Heading>
+      <Heading mb={6}>Bienvenido{auth?.fullName ? `, ${auth.fullName}` : ''}</Heading>
 
       <StatCards />
 

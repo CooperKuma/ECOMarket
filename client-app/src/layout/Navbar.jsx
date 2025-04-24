@@ -57,7 +57,7 @@ import {
   FaCar,
   FaInfoCircle,
 } from "react-icons/fa"
-import { useAuth } from "../context/AuthContext" // Asumiendo que tienes un AuthContext
+import { useAuth } from "../modules/auth/hooks/useAuth.js" // Asumiendo que tienes un AuthContext
 
 const Navbar = () => {
   const { isOpen, onToggle } = useDisclosure()

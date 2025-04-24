@@ -13,22 +13,22 @@ import {
   Text,
   Checkbox,
   Link,
-  useToast,
   Flex,
+  Alert,
+  AlertIcon,
 } from "@chakra-ui/react"
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons"
 import { useState } from "react"
-import { useAuth } from "../../../context/AuthContext"
-import { useNavigate, Link as RouterLink } from "react-router-dom"
+import { Link as RouterLink } from "react-router-dom"
 import { useColorModeValue } from "@chakra-ui/react"
+import { useAuth } from "../hooks/useAuth"
+import { validateWithSchema, loginSchema } from "../utils/validations"
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [form, setForm] = useState({ email: "", password: "" })
   const [errors, setErrors] = useState({})
-  const toast = useToast()
-  const navigate = useNavigate()
-  const { login } = useAuth()
+  const { login, isLoading, error } = useAuth()
 
   const accentColor = useColorModeValue("accent.primary", "accent.primary")
   const inputBg = useColorModeValue("bg.surface", "bg.surface")
@@ -43,42 +43,27 @@ const LoginForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    const validationErrors = {}
-    if (!form.email) validationErrors.email = "Correo requerido"
-    if (!form.password) validationErrors.password = "Contraseña requerida"
+    // Validar con Zod
+    const validation = validateWithSchema(loginSchema, form)
 
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors)
+    if (!validation.success) {
+      setErrors(validation.errors)
       return
     }
 
-    const res = await login(form)
-    if (!res.success) {
-      setErrors({ password: res.message })
-      toast({
-        title: "Error de autenticación",
-        description: res.message,
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      })
-      return
-    }
-
-    toast({
-      title: "Inicio de sesión exitoso",
-      description: `Bienvenido, ${form.email}`,
-      status: "success",
-      duration: 3000,
-      isClosable: true,
-    })
-
-    navigate("/dashboard")
+    await login(form)
   }
 
   return (
     <form onSubmit={handleSubmit}>
       <VStack spacing={4}>
+        {error && (
+          <Alert status="error" borderRadius="md">
+            <AlertIcon />
+            {error}
+          </Alert>
+        )}
+
         <FormControl isInvalid={!!errors.email}>
           <FormLabel>Correo electrónico</FormLabel>
           <Input
@@ -131,7 +116,14 @@ const LoginForm = () => {
           </Link>
         </Flex>
 
-        <Button type="submit" colorScheme="blue" w="full" fontWeight="bold">
+        <Button
+          type="submit"
+          colorScheme="blue"
+          w="full"
+          fontWeight="bold"
+          isLoading={isLoading}
+          loadingText="Iniciando sesión..."
+        >
           Iniciar sesión
         </Button>
 

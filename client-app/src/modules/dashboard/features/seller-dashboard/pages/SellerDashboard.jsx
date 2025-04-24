@@ -1,14 +1,21 @@
-import { Box, Heading } from "@chakra-ui/react"
+import { Box, Heading, SimpleGrid } from "@chakra-ui/react"
 import SellerStatCards from "../components/SellerStatCards"
 import RecentOrdersTable from "../components/RecentOrdersTable"
 import TopProductsTable from "../components/TopProductsTable"
 import SalesPerformance from "../components/SalesPerformance"
-import { SimpleGrid } from "@chakra-ui/react"
+import { useAuth } from "../../../../auth/hooks/useAuth"
+import { Navigate } from 'react-router-dom'
 
 const SellerDashboard = () => {
+  const { auth } = useAuth()
+  const roles = (auth?.roles || []).map(r => r.toLowerCase())
+  const isSeller = roles.includes('seller') || roles.includes('admin')
+  
+  if (!isSeller) return <Navigate to="/dashboard" replace />
+
   return (
     <Box>
-      <Heading mb={6}>Panel de Vendedor</Heading>
+      <Heading mb={6}>Bienvenido{auth?.fullName ? `, ${auth.fullName}` : ''}</Heading>
 
       <SellerStatCards />
 

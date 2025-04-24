@@ -1,7 +1,7 @@
 "use client"
 
-import { Box, Flex, VStack, Icon, Text, Divider, useColorModeValue, Button, Badge } from "@chakra-ui/react"
-import { NavLink } from "react-router-dom"
+import { Box, VStack, Icon, Text, Divider, useColorModeValue } from "@chakra-ui/react"
+import { NavLink, useLocation } from "react-router-dom"
 import {
   FaHome,
   FaShoppingBag,
@@ -13,195 +13,146 @@ import {
   FaTags,
   FaMoneyBillWave,
   FaCog,
-  FaUsers,
-  FaClipboardList,
-  FaShieldAlt,
 } from "react-icons/fa"
 import { useDashboardContext } from "../../context/DashboardContext"
+import { useAuth } from "../../../auth/hooks/useAuth.js"
 
-const NavItem = ({ icon, children, to, isActive, badge }) => {
+const NavItem = ({ icon, children, to, isActive }) => {
   const { sidebarOpen } = useDashboardContext()
-  const activeBg = useColorModeValue("brand.primary.100", "brand.primary.900")
+  const activeBg = useColorModeValue("blue.50", "blue.900")
   const hoverBg = useColorModeValue("gray.100", "gray.700")
 
   return (
-    <Flex
+    <Box
       as={NavLink}
       to={to}
-      align="center"
+      display="flex"
+      alignItems="center"
       p="3"
-      mx="2"
-      borderRadius="md"
+      mx="4"
+      borderRadius="lg"
       role="group"
       cursor="pointer"
+      bg={isActive ? activeBg : "transparent"}
+      color={isActive ? "blue.500" : "inherit"}
       _hover={{
         bg: hoverBg,
-        color: "accent.primary",
+        color: "blue.500",
       }}
-      bg={isActive ? activeBg : "transparent"}
-      color={isActive ? "accent.primary" : "text.primary"}
-      fontWeight={isActive ? "bold" : "normal"}
-      position="relative"
     >
-      <Icon mr={sidebarOpen ? 4 : 0} fontSize="18" as={icon} />
-      <Text opacity={sidebarOpen ? 1 : 0} transition="opacity 0.2s">
-        {children}
-      </Text>
-      {badge && (
-        <Badge
-          colorScheme="green"
-          position="absolute"
-          right={2}
-          opacity={sidebarOpen ? 1 : 0}
-          transition="opacity 0.2s"
-        >
-          {badge}
-        </Badge>
-      )}
-    </Flex>
+      <Icon as={icon} mr={sidebarOpen ? "3" : "0"} fontSize="16" />
+      {sidebarOpen && <Text>{children}</Text>}
+    </Box>
   )
 }
 
 const Sidebar = () => {
-  const { sidebarOpen, isMobile, userRole, isAdmin, activeView, toggleActiveView } = useDashboardContext()
+  const { sidebarOpen, isMobile, activeView } = useDashboardContext()
+  const location = useLocation()
+  const { auth } = useAuth()
   const bgColor = useColorModeValue("white", "gray.800")
   const borderColor = useColorModeValue("gray.200", "gray.700")
-  const adminBgColor = useColorModeValue("orange.50", "gray.700")
 
-  // Simular rutas activas para el ejemplo
-  const activeRoute = "/dashboard"
-
-  // Determinar qué vista mostrar
-  const viewToShow = isAdmin ? activeView : userRole
+  if (!auth) return null
 
   return (
     <Box
       as="nav"
       position="fixed"
+      top="60px"
       left="0"
       h="calc(100vh - 60px)"
-      top="60px"
-      w={sidebarOpen ? "250px" : "80px"}
+      w={sidebarOpen ? "250px" : "70px"}
+      display={{ base: sidebarOpen ? "block" : "none", md: "block" }}
       bg={bgColor}
       borderRightWidth="1px"
       borderColor={borderColor}
-      transition="width 0.3s ease"
-      overflowX="hidden"
-      zIndex="900"
-      display={isMobile && !sidebarOpen ? "none" : "block"}
+      transition="all 0.3s"
+      overflowY="auto"
+      zIndex="sticky"
     >
-      <VStack align="stretch" spacing={1} py={4}>
-        <NavItem icon={FaHome} to="/dashboard" isActive={activeRoute === "/dashboard"}>
-          Inicio
+      <VStack spacing="2" align="stretch" py="4">
+        <NavItem 
+          icon={FaHome} 
+          to="/dashboard" 
+          isActive={location.pathname === "/dashboard"}
+        >
+          Mi Cuenta
         </NavItem>
 
-        {/* Admin View Selector */}
-        {isAdmin && (
-          <Box mx={2} mb={2} p={3} bg={adminBgColor} borderRadius="md" display={sidebarOpen ? "block" : "none"}>
-            <Text fontSize="sm" fontWeight="bold" mb={2}>
-              Vista de Administrador
-            </Text>
-            <Button
-              size="sm"
-              colorScheme={activeView === "buyer" ? "green" : "gray"}
-              mr={2}
-              onClick={() => toggleActiveView()}
-              isActive={activeView === "buyer"}
-            >
-              Comprador
-            </Button>
-            <Button
-              size="sm"
-              colorScheme={activeView === "seller" ? "blue" : "gray"}
-              onClick={() => toggleActiveView()}
-              isActive={activeView === "seller"}
-            >
-              Vendedor
-            </Button>
-          </Box>
-        )}
-
-        {/* Admin Only Section */}
-        {userRole === "admin" && (
+        {activeView === "buyer" && (
           <>
             <NavItem
-              icon={FaUsers}
-              to="/dashboard/admin/users"
-              isActive={activeRoute === "/dashboard/admin/users"}
-              badge="New"
+              icon={FaShoppingBag}
+              to="/dashboard/orders"
+              isActive={location.pathname.startsWith("/dashboard/orders")}
             >
-              Usuarios
-            </NavItem>
-            <NavItem
-              icon={FaClipboardList}
-              to="/dashboard/admin/reports"
-              isActive={activeRoute === "/dashboard/admin/reports"}
-            >
-              Reportes
-            </NavItem>
-            <NavItem
-              icon={FaShieldAlt}
-              to="/dashboard/admin/security"
-              isActive={activeRoute === "/dashboard/admin/security"}
-            >
-              Seguridad
-            </NavItem>
-            <Divider my={2} />
-          </>
-        )}
-
-        {/* Buyer View */}
-        {(viewToShow === "buyer" || viewToShow === "admin") && (
-          <>
-            <NavItem icon={FaShoppingBag} to="/dashboard/orders" isActive={activeRoute === "/dashboard/orders"}>
               Mis Compras
             </NavItem>
-            <NavItem icon={FaHeart} to="/dashboard/favorites" isActive={activeRoute === "/dashboard/favorites"}>
+            <NavItem
+              icon={FaHeart}
+              to="/dashboard/favorites"
+              isActive={location.pathname === "/dashboard/favorites"}
+            >
               Favoritos
             </NavItem>
-            <NavItem icon={FaUser} to="/dashboard/profile" isActive={activeRoute === "/dashboard/profile"}>
+            <NavItem
+              icon={FaUser}
+              to="/dashboard/profile"
+              isActive={location.pathname === "/dashboard/profile"}
+            >
               Mi Perfil
             </NavItem>
           </>
         )}
 
-        {/* Seller View */}
-        {(viewToShow === "seller" || viewToShow === "admin") && (
+        {activeView === "seller" && (
           <>
-            <NavItem icon={FaStore} to="/dashboard/seller/store" isActive={activeRoute === "/dashboard/seller/store"}>
+            <NavItem
+              icon={FaStore}
+              to="/dashboard/seller/store"
+              isActive={location.pathname === "/dashboard/seller/store"}
+            >
               Mi Tienda
             </NavItem>
             <NavItem
               icon={FaBox}
               to="/dashboard/seller/products"
-              isActive={activeRoute === "/dashboard/seller/products"}
-              badge="5"
+              isActive={location.pathname.startsWith("/dashboard/seller/products")}
             >
               Productos
             </NavItem>
-            <NavItem icon={FaTags} to="/dashboard/seller/orders" isActive={activeRoute === "/dashboard/seller/orders"}>
+            <NavItem
+              icon={FaTags}
+              to="/dashboard/seller/orders"
+              isActive={location.pathname === "/dashboard/seller/orders"}
+            >
               Ventas
             </NavItem>
             <NavItem
               icon={FaChartLine}
               to="/dashboard/seller/analytics"
-              isActive={activeRoute === "/dashboard/seller/analytics"}
+              isActive={location.pathname === "/dashboard/seller/analytics"}
             >
               Estadísticas
             </NavItem>
             <NavItem
               icon={FaMoneyBillWave}
               to="/dashboard/seller/finances"
-              isActive={activeRoute === "/dashboard/seller/finances"}
+              isActive={location.pathname === "/dashboard/seller/finances"}
             >
               Finanzas
             </NavItem>
           </>
         )}
 
-        <Divider my={2} />
+        <Divider my="2" />
 
-        <NavItem icon={FaCog} to="/dashboard/settings" isActive={activeRoute === "/dashboard/settings"}>
+        <NavItem
+          icon={FaCog}
+          to="/dashboard/settings"
+          isActive={location.pathname === "/dashboard/settings"}
+        >
           Configuración
         </NavItem>
       </VStack>

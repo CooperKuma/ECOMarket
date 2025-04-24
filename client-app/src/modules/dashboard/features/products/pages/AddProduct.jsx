@@ -17,13 +17,19 @@ import {
   useColorModeValue,
 } from "@chakra-ui/react"
 import { FaArrowLeft, FaSave } from "react-icons/fa"
-import { Link } from "react-router-dom"
+import { Link, Navigate } from "react-router-dom"
 import { useState } from "react"
+import { useAuth } from "../../../../auth/hooks/useAuth.js"
 import ProductForm from "../components/ProductForm"
 import ImageUploader from "../components/ImageUploader"
 import VariationsManager from "../components/VariationsManager"
 
 const AddProduct = () => {
+  const { user } = useAuth()
+  const roles = (user?.roles || []).map(r => r.toLowerCase())
+  const isSeller = roles.includes('seller') || roles.includes('admin')
+  if (!isSeller) return <Navigate to="/dashboard" replace />
+
   const toast = useToast()
   const cardBg = useColorModeValue("white", "gray.800")
   const borderColor = useColorModeValue("gray.200", "gray.700")

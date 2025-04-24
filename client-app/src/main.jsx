@@ -5,7 +5,7 @@ import { BrowserRouter } from "react-router-dom";
 import { ChakraProvider, ColorModeScript } from "@chakra-ui/react";
 import App from "./App";
 import theme from "./theme";
-import { AuthProvider } from "./context/AuthContext";
+import { AuthProvider } from "./modules/auth/context/AuthProvider.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>

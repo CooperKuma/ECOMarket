@@ -2,13 +2,19 @@
 
 import { Box, Heading, Flex, Button, Text, useDisclosure, useToast } from "@chakra-ui/react"
 import { FaPlus } from "react-icons/fa"
-import { Link } from "react-router-dom"
+import { Link, Navigate } from "react-router-dom"
 import { useState } from "react"
+import { useAuth } from '../../../../auth/hooks/useAuth.js'
 import ProductsFilter from "../components/ProductsFilter"
 import ProductsTable from "../components/ProductsTable"
 import DeleteProductModal from "../components/DeleteProductModal"
 
 const Products = () => {
+  const { user } = useAuth()
+  const roles = (user?.roles || []).map(r => r.toLowerCase())
+  const isSeller = roles.includes('seller') || roles.includes('admin')
+  if (!isSeller) return <Navigate to="/dashboard" replace />
+
   const [filter, setFilter] = useState("all")
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedProduct, setSelectedProduct] = useState(null)

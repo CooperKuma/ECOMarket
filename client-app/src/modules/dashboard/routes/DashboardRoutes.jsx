@@ -18,31 +18,140 @@ import Analytics from "../pages/seller/Analytics"
 import SellerStore from "../pages/seller/SellerStore"
 import Finances from "../pages/seller/Finances"
 
+// Páginas de admin
+import AdminDashboard from "../features/admin-dashboard/pages/AdminDashboard"
+
 // Página de configuración común
 import Settings from "../pages/common/Settings"
 
 const DashboardRoutes = () => {
-  const { userRole } = useDashboardContext()
+  const { activeView, hasRole } = useDashboardContext()
+
+  // Proteger rutas según el rol
+  const ProtectedRoute = ({ children, requiredRole }) => {
+    if (!hasRole(requiredRole)) {
+      return <Navigate to="/dashboard" replace />
+    }
+    return children
+  }
+
+  // Renderizar el dashboard correcto según el rol y la vista activa
+  const renderDashboard = () => {
+    if (hasRole("admin")) {
+      return (
+        <ProtectedRoute requiredRole="admin">
+          <AdminDashboard />
+        </ProtectedRoute>
+      )
+    }
+    
+    return activeView === "seller" ? (
+      <ProtectedRoute requiredRole="seller">
+        <SellerDashboard />
+      </ProtectedRoute>
+    ) : (
+      <ProtectedRoute requiredRole="buyer">
+        <BuyerDashboard />
+      </ProtectedRoute>
+    )
+  }
 
   return (
     <Routes>
       {/* Ruta principal del dashboard */}
-      <Route path="/" element={userRole === "buyer" ? <BuyerDashboard /> : <SellerDashboard />} />
+      <Route index element={renderDashboard()} />
 
       {/* Rutas de comprador */}
-      <Route path="/orders" element={<Orders />} />
-      <Route path="/orders/:id" element={<OrderDetail />} />
-      <Route path="/favorites" element={<Favorites />} />
-      <Route path="/profile" element={<BuyerProfile />} />
+      <Route 
+        path="/orders" 
+        element={
+          <ProtectedRoute requiredRole="buyer">
+            <Orders />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/orders/:id" 
+        element={
+          <ProtectedRoute requiredRole="buyer">
+            <OrderDetail />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/favorites" 
+        element={
+          <ProtectedRoute requiredRole="buyer">
+            <Favorites />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/profile" 
+        element={
+          <ProtectedRoute requiredRole="buyer">
+            <BuyerProfile />
+          </ProtectedRoute>
+        } 
+      />
 
       {/* Rutas de vendedor */}
-      <Route path="/seller/store" element={<SellerStore />} />
-      <Route path="/seller/products" element={<Products />} />
-      <Route path="/seller/products/add" element={<AddProduct />} />
-      <Route path="/seller/products/edit/:id" element={<EditProduct />} />
-      <Route path="/seller/orders" element={<SellerOrders />} />
-      <Route path="/seller/analytics" element={<Analytics />} />
-      <Route path="/seller/finances" element={<Finances />} />
+      <Route 
+        path="/seller/store" 
+        element={
+          <ProtectedRoute requiredRole="seller">
+            <SellerStore />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/seller/products" 
+        element={
+          <ProtectedRoute requiredRole="seller">
+            <Products />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/seller/products/add" 
+        element={
+          <ProtectedRoute requiredRole="seller">
+            <AddProduct />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/seller/products/edit/:id" 
+        element={
+          <ProtectedRoute requiredRole="seller">
+            <EditProduct />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/seller/orders" 
+        element={
+          <ProtectedRoute requiredRole="seller">
+            <SellerOrders />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/seller/analytics" 
+        element={
+          <ProtectedRoute requiredRole="seller">
+            <Analytics />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/seller/finances" 
+        element={
+          <ProtectedRoute requiredRole="seller">
+            <Finances />
+          </ProtectedRoute>
+        } 
+      />
 
       {/* Configuración (común) */}
       <Route path="/settings" element={<Settings />} />

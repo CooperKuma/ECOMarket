@@ -20,13 +20,19 @@ import {
   Text,
 } from "@chakra-ui/react"
 import { FaArrowLeft, FaSave, FaExclamationTriangle } from "react-icons/fa"
-import { Link, useParams } from "react-router-dom"
+import { Link, useParams, Navigate } from "react-router-dom"
 import { useState, useEffect } from "react"
 import ProductForm from "../components/ProductForm"
 import ImageUploader from "../components/ImageUploader"
 import VariationsManager from "../components/VariationsManager"
+import { useAuth } from "../../../../auth/hooks/useAuth.js"
 
 const EditProduct = () => {
+  const { user } = useAuth()
+  const roles = (user?.roles || []).map(r => r.toLowerCase())
+  const isSeller = roles.includes('seller') || roles.includes('admin')
+  if (!isSeller) return <Navigate to="/dashboard" replace />
+
   const { id } = useParams()
   const toast = useToast()
   const cardBg = useColorModeValue("white", "gray.800")

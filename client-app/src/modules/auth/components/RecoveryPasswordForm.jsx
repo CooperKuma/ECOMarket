@@ -8,7 +8,6 @@ import {
   FormErrorMessage,
   VStack,
   Text,
-  useToast,
   Alert,
   AlertIcon,
   AlertTitle,
@@ -17,51 +16,33 @@ import {
 } from "@chakra-ui/react"
 import { useState } from "react"
 import { useColorModeValue } from "@chakra-ui/react"
+import { useRecoveryPassword } from "../hooks/useRecoveryPassword.js"
+import { validateWithSchema, recoveryEmailSchema } from "../utils/validations"
 
 const RecoveryPasswordForm = () => {
   const [email, setEmail] = useState("")
-  const [error, setError] = useState("")
-  const [isSubmitted, setIsSubmitted] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const toast = useToast()
+  const [errors, setErrors] = useState({})
+  const { requestRecovery, isLoading, isSubmitted, error } = useRecoveryPassword()
 
   const inputBg = useColorModeValue("bg.surface", "bg.surface")
 
   const handleChange = (e) => {
     setEmail(e.target.value)
-    setError("")
+    setErrors({})
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
 
-    if (!email) {
-      setError("Correo electrónico requerido")
+    // Validar con Zod
+    const validation = validateWithSchema(recoveryEmailSchema, { email })
+
+    if (!validation.success) {
+      setErrors(validation.errors)
       return
     }
 
-    // Validación básica de formato de email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(email)) {
-      setError("Formato de correo electrónico inválido")
-      return
-    }
-
-    setIsLoading(true)
-
-    // Simulación de envío de correo de recuperación
-    setTimeout(() => {
-      setIsLoading(false)
-      setIsSubmitted(true)
-
-      toast({
-        title: "Correo enviado",
-        description: "Hemos enviado instrucciones para recuperar tu contraseña",
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-      })
-    }, 1500)
+    await requestRecovery(email)
   }
 
   if (isSubmitted) {
@@ -104,7 +85,14 @@ const RecoveryPasswordForm = () => {
           Ingresa tu correo electrónico y te enviaremos instrucciones para restablecer tu contraseña.
         </Text>
 
-        <FormControl isInvalid={!!error}>
+        {error && (
+          <Alert status="error" borderRadius="md">
+            <AlertIcon />
+            {error}
+          </Alert>
+        )}
+
+        <FormControl isInvalid={!!errors.email}>
           <FormLabel>Correo electrónico</FormLabel>
           <Input
             type="email"
@@ -114,7 +102,7 @@ const RecoveryPasswordForm = () => {
             bg={inputBg}
             focusBorderColor="accent.primary"
           />
-          <FormErrorMessage>{error}</FormErrorMessage>
+          <FormErrorMessage>{errors.email}</FormErrorMessage>
         </FormControl>
 
         <Button

@@ -17,6 +17,8 @@ import {
   useColorModeValue,
 } from "@chakra-ui/react"
 import { useState } from "react"
+import { useAuth } from '../../../../auth/hooks/useAuth.js'
+import { Navigate } from 'react-router-dom'
 import ProfileHeader from "../components/ProfileHeader"
 import ProfileForm from "../components/ProfileForm"
 import AddressList from "../components/AddressList"
@@ -25,6 +27,11 @@ import SecuritySettings from "../components/SecuritySettings"
 import ActivityHistory from "../components/ActivityHistory"
 
 const BuyerProfile = () => {
+  const { user } = useAuth()
+  const roles = (user?.roles || []).map(r => r.toLowerCase())
+  const isBuyer = roles.includes('buyer') || roles.includes('admin')
+  if (!isBuyer) return <Navigate to="/dashboard" replace />
+
   const toast = useToast()
   const cardBg = useColorModeValue("white", "gray.800")
   const borderColor = useColorModeValue("gray.200", "gray.700")
