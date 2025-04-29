@@ -4,6 +4,129 @@ info:
   version: 1.0.0
   description: Documentación combinada de los módulos de la API
 paths:
+  /api/catalogs:
+    get:
+      tags:
+      - Catalogs
+      summary: Obtener todos los catálogos
+      responses:
+        '200':
+          description: Lista de catálogos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CatalogDTO'
+    post:
+      tags:
+      - Catalogs
+      summary: Crear un nuevo catálogo
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CatalogRequestDTO'
+      responses:
+        '201':
+          description: Catálogo creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CatalogDTO'
+  /catalogs/{id}:
+    get:
+      tags:
+      - Catalogs
+      summary: Obtener un catálogo por ID
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Catálogo encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CatalogDTO'
+    put:
+      tags:
+      - Catalogs
+      summary: Actualizar un catálogo
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CatalogRequestDTO'
+      responses:
+        '200':
+          description: Catálogo actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CatalogDTO'
+    delete:
+      tags:
+      - Catalogs
+      summary: Eliminar un catálogo
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Eliminado correctamente
+  /catalogs/status/{statusId}:
+    get:
+      tags:
+      - Catalogs
+      summary: Obtener catálogos por statusId
+      parameters:
+      - name: statusId
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Lista de catálogos por statusId
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CatalogDTO'
+  /catalogs/{id}/with-subcatalogs:
+    get:
+      tags:
+      - Catalogs
+      summary: Obtener un catálogo con subcatálogos
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Catálogo con subcatálogos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CatalogDTO'
   /api/roles:
     get:
       summary: Obtener todos los roles
@@ -98,6 +221,156 @@ paths:
       responses:
         '204':
           description: Rol eliminado
+  /api/subcatalogs:
+    get:
+      summary: Obtener todos los subcatálogos
+      tags:
+      - Subcatalogs
+      responses:
+        '200':
+          description: Lista de subcatálogos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SubcatalogDTO'
+    post:
+      summary: Crear un nuevo subcatálogo
+      tags:
+      - Subcatalogs
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubcatalogRequestDTO'
+      responses:
+        '201':
+          description: Subcatálogo creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubcatalogDTO'
+  /api/subcatalogs/{id}:
+    get:
+      summary: Obtener un subcatálogo por su ID
+      tags:
+      - Subcatalogs
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Subcatálogo encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubcatalogDTO'
+    put:
+      summary: Actualizar un subcatálogo por su ID
+      tags:
+      - Subcatalogs
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubcatalogRequestDTO'
+      responses:
+        '200':
+          description: Subcatálogo actualizado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubcatalogDTO'
+    delete:
+      summary: Eliminar un subcatálogo por su ID
+      tags:
+      - Subcatalogs
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Subcatálogo eliminado exitosamente
+  /api/subcatalogs/catalog/{catalogId}:
+    get:
+      summary: Obtener subcatálogos por catalogId
+      tags:
+      - Subcatalogs
+      parameters:
+      - name: catalogId
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Lista de subcatálogos filtrados por catálogo
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SubcatalogDTO'
+  /api/subcatalogs/status/{statusId}:
+    get:
+      summary: Obtener subcatálogos por statusId
+      tags:
+      - Subcatalogs
+      parameters:
+      - name: statusId
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Lista de subcatálogos filtrados por estado
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SubcatalogDTO'
+  /api/subcatalogs/catalog/{catalogId}/status/{statusId}:
+    get:
+      summary: Obtener subcatálogos por catalogId y statusId
+      tags:
+      - Subcatalogs
+      parameters:
+      - name: catalogId
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: statusId
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Lista de subcatálogos filtrados por catálogo y estado
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SubcatalogDTO'
   /api/users:
     get:
       summary: Obtener todos los usuarios
@@ -246,6 +519,45 @@ paths:
           description: Rol removido exitosamente
 components:
   schemas:
+    CatalogDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        imageUrl:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        statusId:
+          type: integer
+        subcatalogIds:
+          type: array
+          items:
+            type: integer
+    CatalogRequestDTO:
+      type: object
+      required:
+      - name
+      - description
+      - imageUrl
+      - statusId
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        imageUrl:
+          type: string
+        statusId:
+          type: integer
     RoleDTO:
       type: object
       properties:
@@ -255,6 +567,44 @@ components:
         name:
           type: string
           example: seller
+    SubcatalogDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        imageUrl:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        statusId:
+          type: integer
+        catalogId:
+          type: integer
+    SubcatalogRequestDTO:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        imageUrl:
+          type: string
+        statusId:
+          type: integer
+        catalogId:
+          type: integer
+      required:
+      - name
+      - statusId
+      - catalogId
     UserDTO:
       type: object
       properties:
