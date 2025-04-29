@@ -14,7 +14,7 @@ paths:
       tags:
         - Subcatalogs
       responses:
-        "200":
+        200:
           description: Lista de subcatálogos
           content:
             application/json:
@@ -33,7 +33,7 @@ paths:
             schema:
               $ref: "#/components/schemas/SubcatalogRequestDTO"
       responses:
-        "201":
+        201:
           description: Subcatálogo creado exitosamente
           content:
             application/json:
@@ -52,7 +52,7 @@ paths:
           schema:
             type: integer
       responses:
-        "200":
+        200:
           description: Subcatálogo encontrado
           content:
             application/json:
@@ -75,7 +75,7 @@ paths:
             schema:
               $ref: "#/components/schemas/SubcatalogRequestDTO"
       responses:
-        "200":
+        200:
           description: Subcatálogo actualizado exitosamente
           content:
             application/json:
@@ -92,7 +92,7 @@ paths:
           schema:
             type: integer
       responses:
-        "204":
+        204:
           description: Subcatálogo eliminado exitosamente
 
   /api/subcatalogs/catalog/{catalogId}:
@@ -107,7 +107,7 @@ paths:
           schema:
             type: integer
       responses:
-        "200":
+        200:
           description: Lista de subcatálogos filtrados por catálogo
           content:
             application/json:
@@ -128,7 +128,7 @@ paths:
           schema:
             type: integer
       responses:
-        "200":
+        200:
           description: Lista de subcatálogos filtrados por estado
           content:
             application/json:
@@ -154,7 +154,7 @@ paths:
           schema:
             type: integer
       responses:
-        "200":
+        200:
           description: Lista de subcatálogos filtrados por catálogo y estado
           content:
             application/json:

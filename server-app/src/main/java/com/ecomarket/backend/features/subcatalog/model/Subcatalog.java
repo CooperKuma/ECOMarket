@@ -45,6 +45,12 @@ public class Subcatalog {
         this.updatedAt = LocalDateTime.now();
     }
 
+    @Column(name = "price", nullable = false)
+    private Double price;
+
+    @Column(name = "short_description", length = 255)
+    private String shortDescription;
+
     @PreUpdate
     public void preUpdate() {
         this.updatedAt = LocalDateTime.now();

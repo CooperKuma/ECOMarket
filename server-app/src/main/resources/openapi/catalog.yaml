@@ -1,10 +1,11 @@
+---
 openapi: 3.1.0
 info:
   title: API de Catalogo - Ecomarket
   description: Title
   version: 1.0.0
 servers:
-  - url: 'https'
+  - url: https
 paths:
   /api/catalogs:
     get:
@@ -12,14 +13,14 @@ paths:
         - Catalogs
       summary: Obtener todos los catálogos
       responses:
-        '200':
+        "200":
           description: Lista de catálogos
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/CatalogDTO'
+                  $ref: "#/components/schemas/CatalogDTO"
     post:
       tags:
         - Catalogs
@@ -29,16 +30,15 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CatalogRequestDTO'
+              $ref: "#/components/schemas/CatalogRequestDTO"
       responses:
-        '201':
+        "201":
           description: Catálogo creado
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CatalogDTO'
-
-  /catalogs/{id}:
+                $ref: "#/components/schemas/CatalogDTO"
+  "/api/catalogs/{id}":
     get:
       tags:
         - Catalogs
@@ -50,12 +50,12 @@ paths:
           schema:
             type: integer
       responses:
-        '200':
+        "200":
           description: Catálogo encontrado
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CatalogDTO'
+                $ref: "#/components/schemas/CatalogDTO"
     put:
       tags:
         - Catalogs
@@ -71,14 +71,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CatalogRequestDTO'
+              $ref: "#/components/schemas/CatalogRequestDTO"
       responses:
-        '200':
+        "200":
           description: Catálogo actualizado
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CatalogDTO'
+                $ref: "#/components/schemas/CatalogDTO"
     delete:
       tags:
         - Catalogs
@@ -90,10 +90,9 @@ paths:
           schema:
             type: integer
       responses:
-        '204':
+        "204":
           description: Eliminado correctamente
-
-  /catalogs/status/{statusId}:
+  "/api/catalogs/status/{statusId}":
     get:
       tags:
         - Catalogs
@@ -105,16 +104,15 @@ paths:
           schema:
             type: integer
       responses:
-        '200':
+        "200":
           description: Lista de catálogos por statusId
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/CatalogDTO'
-
-  /catalogs/{id}/with-subcatalogs:
+                  $ref: "#/components/schemas/CatalogDTO"
+  "/api/catalogs/{id}/with-subcatalogs":
     get:
       tags:
         - Catalogs
@@ -126,13 +124,12 @@ paths:
           schema:
             type: integer
       responses:
-        '200':
+        "200":
           description: Catálogo con subcatálogos
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CatalogDTO'
-
+                $ref: "#/components/schemas/CatalogDTO"
 components:
   schemas:
     CatalogDTO:
@@ -158,7 +155,6 @@ components:
           type: array
           items:
             type: integer
-
     CatalogRequestDTO:
       type: object
       required:
@@ -175,5 +171,3 @@ components:
           type: string
         statusId:
           type: integer
-
-  

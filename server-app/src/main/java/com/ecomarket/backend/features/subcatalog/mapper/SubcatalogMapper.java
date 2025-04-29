@@ -12,12 +12,14 @@ public class SubcatalogMapper {
                 entity.getId(),
                 entity.getName(),
                 entity.getDescription(),
+                entity.getShortDescription(),
                 entity.getImageUrl(),
                 entity.getCatalog().getId(),
                 entity.getCatalog().getName(),
                 entity.getCreatedAt(),
                 entity.getUpdatedAt(),
-                entity.getStatusId()
+                entity.getStatusId(),
+                entity.getPrice()
         );
     }
 
@@ -25,17 +27,21 @@ public class SubcatalogMapper {
         return Subcatalog.builder()
                 .name(dto.name())
                 .description(dto.description())
+                .shortDescription(dto.shortDescription())
                 .imageUrl(dto.imageUrl())
                 .catalog(catalog)
                 .statusId(dto.statusId())
+                .price(dto.price())
                 .build();
     }
 
     public static void updateEntityFromDTO(Subcatalog entity, SubcatalogRequestDTO dto, Catalog catalog) {
         entity.setName(dto.name());
         entity.setDescription(dto.description());
+        entity.setShortDescription(dto.shortDescription());
         entity.setImageUrl(dto.imageUrl());
         entity.setCatalog(catalog);
         entity.setStatusId(dto.statusId());
+        entity.setPrice(dto.price());
     }
 }

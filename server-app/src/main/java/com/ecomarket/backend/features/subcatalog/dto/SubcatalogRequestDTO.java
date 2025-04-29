@@ -5,5 +5,7 @@ public record SubcatalogRequestDTO(
         String description,
         String imageUrl,
         Long catalogId,
-        Integer statusId
+        Integer statusId,
+        String shortDescription,
+        Double price
 ) {}
