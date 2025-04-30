@@ -1,12 +1,22 @@
 package com.ecomarket.backend.features.product.model;
 
+import com.ecomarket.backend.features.user.model.User;
 import jakarta.persistence.*;
+import lombok.*;
+
 import java.util.List;
 
 @Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Product {
-    @Id @GeneratedValue
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String name;
     private String description;
     private Integer price;
@@ -20,7 +30,8 @@ public class Product {
     private List<String> images;
 
     @ManyToOne
-    private Seller seller;
+    @JoinColumn(name = "seller_id")
+    private User seller;
 
     private String category;
     private String subcategory;

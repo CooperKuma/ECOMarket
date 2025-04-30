@@ -17,17 +17,9 @@ export const getProducts = (params) =>
 export const getProductById = (id) =>
   API.get(`/products/${id}`).then((res) => res.data)
 
-export const getCategories = () =>
-  API.get("/categories").then((res) => res.data)
-
-export const getSubcategories = (categoryId) =>
-  API.get(`/categories/${categoryId}/subcategories`).then((res) => res.data)
-
 const catalogService = {
   getProducts,
   getProductById,
-  getCategories,
-  getSubcategories,
-}
+ }
 
 export default catalogService

@@ -17,11 +17,12 @@ import {
 import { useDashboardContext } from "../../context/DashboardContext"
 import { useAuth } from "../../../auth/hooks/useAuth.js"
 
-const NavItem = ({ icon, children, to, isActive }) => {
+const NavItem = ({ icon, children, to, isActive, ...rest }) => {
   const { sidebarOpen } = useDashboardContext()
   const activeBg = useColorModeValue("blue.50", "blue.900")
   const hoverBg = useColorModeValue("gray.100", "gray.700")
 
+  // No pasar isActive al Box, solo usarlo para lógica de estilos
   return (
     <Box
       as={NavLink}
@@ -39,6 +40,7 @@ const NavItem = ({ icon, children, to, isActive }) => {
         bg: hoverBg,
         color: "blue.500",
       }}
+      {...rest}
     >
       <Icon as={icon} mr={sidebarOpen ? "3" : "0"} fontSize="16" />
       {sidebarOpen && <Text>{children}</Text>}

@@ -1,7 +1,7 @@
 package com.ecomarket.backend.features.product.controller;
 
-import com.ecomarket.backend.features.product.dto.ProductListDTO;
 import com.ecomarket.backend.features.product.dto.ProductDetailDTO;
+import com.ecomarket.backend.features.product.dto.ProductListDTO;
 import com.ecomarket.backend.features.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -17,9 +17,9 @@ public class ProductController {
 
     @GetMapping
     public List<ProductListDTO> getCatalog(
-        @RequestParam(required = false) String category,
-        @RequestParam(required = false) String search,
-        @RequestParam(defaultValue = "0") int page
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String search,
+            @RequestParam(defaultValue = "0") int page
     ) {
         return productService.getProducts(category, search, page);
     }

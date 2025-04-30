@@ -34,11 +34,12 @@ import ProductCard from "../components/ProductCard"
 import Pagination from "../components/Pagination"
 import FilterSidebar from "../components/FilterSidebar"
 import { mockProducts, categories } from "../utils/mockData"
+import catalogService from "../services/catalogService"
 
 const CatalogPage = () => {
   const { category } = useParams()
-  const [products, setProducts] = useState(mockProducts)
-  const [filteredProducts, setFilteredProducts] = useState(mockProducts)
+  const [products, setProducts] = useState([])
+  const [filteredProducts, setFilteredProducts] = useState([])
   const [currentPage, setCurrentPage] = useState(1)
   const [priceRange, setPriceRange] = useState([0, 50000])
   const [selectedSubcategories, setSelectedSubcategories] = useState([])
@@ -59,33 +60,42 @@ const CatalogPage = () => {
   const categoryName = categoryInfo ? categoryInfo.name : "Todos los productos"
   const subcategories = categoryInfo ? categoryInfo.subcategories : []
 
-  // Simulate loading
+  // Fetch products from backend
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false)
-    }, 1000)
-
-    return () => clearTimeout(timer)
+    setIsLoading(true)
+    catalogService.getProducts()
+      .then(data => {
+        setProducts(data)
+        setFilteredProducts(data)
+        setIsLoading(false)
+      })
+      .catch(() => {
+        setProducts(mockProducts)
+        setFilteredProducts(mockProducts)
+        setIsLoading(false)
+      })
   }, [])
 
   // Filter products based on selected filters
   useEffect(() => {
-    let result = [...mockProducts]
+    let result = [...products]
 
     // Filter by category
     if (category && category !== "all") {
-      result = result.filter((product) => product.category.toLowerCase() === categoryName.toLowerCase())
+      result = result.filter((product) => product.category && product.category.toLowerCase() === categoryName.toLowerCase())
     }
 
-    // Filter by subcategories
-    if (selectedSubcategories.length > 0) {
-      // In a real app, you would filter by subcategories here
-      // For this mock, we'll just filter randomly
+    // Filter by subcategories SOLO si hay seleccionadas
+    if (selectedSubcategories && selectedSubcategories.length > 0) {
+      // Aquí podrías filtrar por subcategoría si tu backend lo soporta
+      // Por ahora, solo filtrado simulado
       result = result.filter(() => Math.random() > 0.3)
     }
 
     // Filter by price range
-    result = result.filter((product) => product.price >= priceRange[0] && product.price <= priceRange[1])
+    if (priceRange && priceRange.length === 2) {
+      result = result.filter((product) => product.price >= priceRange[0] && product.price <= priceRange[1])
+    }
 
     // Filter by search term
     if (searchTerm) {
@@ -105,20 +115,21 @@ const CatalogPage = () => {
         result.sort((a, b) => b.price - a.price)
         break
       case "rating":
-        result.sort((a, b) => Number.parseFloat(b.rating) - Number.parseFloat(a.rating))
+        result.sort((a, b) => (Number.parseFloat(b.rating || 0) - Number.parseFloat(a.rating || 0)))
         break
       case "newest":
-        // In a real app, you would sort by date
         result.sort(() => Math.random() - 0.5)
         break
       default:
-        // relevance - in a real app this would be more complex
         break
     }
 
+    // Debug: mostrar cuántos productos hay en cada paso
+    // console.log({ products, result, selectedSubcategories, priceRange, searchTerm, sortBy })
+
     setFilteredProducts(result)
     setCurrentPage(1)
-  }, [category, selectedSubcategories, priceRange, sortBy, searchTerm, categoryName])
+  }, [category, selectedSubcategories, priceRange, sortBy, searchTerm, categoryName, products])
 
   // Get current products for pagination
   const indexOfLastProduct = currentPage * productsPerPage

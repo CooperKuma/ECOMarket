@@ -1,6 +1,7 @@
 package com.ecomarket.backend.features.product_seller.service;
 
 import com.ecomarket.backend.features.product_seller.dto.ProductSellerDTO;
+
 import java.util.List;
 
 public interface ProductSellerService {

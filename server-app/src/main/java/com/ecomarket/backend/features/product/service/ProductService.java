@@ -1,7 +1,8 @@
 package com.ecomarket.backend.features.product.service;
 
-import com.ecomarket.backend.features.product.dto.ProductListDTO;
 import com.ecomarket.backend.features.product.dto.ProductDetailDTO;
+import com.ecomarket.backend.features.product.dto.ProductListDTO;
+
 import java.util.List;
 
 public interface ProductService {

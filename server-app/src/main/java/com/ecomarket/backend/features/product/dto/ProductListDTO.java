@@ -1,16 +1,25 @@
 package com.ecomarket.backend.features.product.dto;
 
-public record ProductListDTO(
-    Long id,
-    String name,
-    String description,
-    Integer price,
-    Integer originalPrice,
-    Double rating,
-    Integer reviews,
-    String image,
-    Boolean freeShipping,
-    Integer stock,
-    String seller,
-    String category
-) {}
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class ProductListDTO {
+    private Long id;
+    private String name;
+    private String description;
+    private Integer price;
+    private Integer originalPrice;
+    private Double rating;
+    private Integer reviews;
+    private String image;
+    private Boolean freeShipping;
+    private Integer stock;
+    private String seller;
+    private String category;
+}

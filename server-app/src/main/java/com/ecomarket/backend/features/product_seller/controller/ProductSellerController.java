@@ -22,12 +22,15 @@ public class ProductSellerController {
     }
 
     @PostMapping
-    public ProductSellerDTO createProduct(@AuthenticationPrincipal UserDetails user, @RequestBody ProductSellerDTO dto) {
+    public ProductSellerDTO createProduct(@AuthenticationPrincipal UserDetails user,
+                                          @RequestBody ProductSellerDTO dto) {
         return productSellerService.createProduct(user.getUsername(), dto);
     }
 
     @PutMapping("/{id}")
-    public ProductSellerDTO updateProduct(@AuthenticationPrincipal UserDetails user, @PathVariable Long id, @RequestBody ProductSellerDTO dto) {
+    public ProductSellerDTO updateProduct(@AuthenticationPrincipal UserDetails user,
+                                          @PathVariable Long id,
+                                          @RequestBody ProductSellerDTO dto) {
         return productSellerService.updateProduct(user.getUsername(), id, dto);
     }
 
