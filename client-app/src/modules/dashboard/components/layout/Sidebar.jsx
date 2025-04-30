@@ -14,11 +14,12 @@ import {
 } from "react-icons/fa"
 import { useDashboardContext } from "../../context/DashboardContext"
 
-const NavItem = ({ icon, children, to, isActive }) => {
+const NavItem = ({ icon, children, to, isActive, ...rest }) => {
   const { sidebarOpen } = useDashboardContext()
   const activeBg = useColorModeValue("brand.primary.100", "brand.primary.900")
   const hoverBg = useColorModeValue("gray.100", "gray.700")
 
+  // No pasar isActive al Box, solo usarlo para lógica de estilos
   return (
     <Flex
       as={NavLink}
@@ -29,18 +30,17 @@ const NavItem = ({ icon, children, to, isActive }) => {
       borderRadius="md"
       role="group"
       cursor="pointer"
+      bg={isActive ? activeBg : "transparent"}
+      color={isActive ? "accent.primary" : "text.primary"}
+      fontWeight={isActive ? "bold" : "normal"}
       _hover={{
         bg: hoverBg,
         color: "accent.primary",
       }}
-      bg={isActive ? activeBg : "transparent"}
-      color={isActive ? "accent.primary" : "text.primary"}
-      fontWeight={isActive ? "bold" : "normal"}
+      {...rest}
     >
-      <Icon mr={sidebarOpen ? 4 : 0} fontSize="18" as={icon} />
-      <Text opacity={sidebarOpen ? 1 : 0} transition="opacity 0.2s">
-        {children}
-      </Text>
+      <Icon as={icon} mr={sidebarOpen ? "3" : "0"} fontSize="16" />
+      {sidebarOpen && <Text>{children}</Text>}
     </Flex>
   )
 }

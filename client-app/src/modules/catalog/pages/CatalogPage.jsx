@@ -33,8 +33,8 @@ import { useParams, Link as RouterLink } from "react-router-dom"
 import ProductCard from "../components/ProductCard"
 import Pagination from "../components/Pagination"
 import FilterSidebar from "../components/FilterSidebar"
-import { mockProducts, categories } from "../utils/mockData"
 import catalogService from "../services/catalogService"
+import { mockProducts, categories } from "../utils/mockData"
 
 const CatalogPage = () => {
   const { category } = useParams()
@@ -76,7 +76,6 @@ const CatalogPage = () => {
       })
   }, [])
 
-  // Filter products based on selected filters
   useEffect(() => {
     let result = [...products]
 
@@ -85,17 +84,14 @@ const CatalogPage = () => {
       result = result.filter((product) => product.category && product.category.toLowerCase() === categoryName.toLowerCase())
     }
 
-    // Filter by subcategories SOLO si hay seleccionadas
-    if (selectedSubcategories && selectedSubcategories.length > 0) {
-      // Aquí podrías filtrar por subcategoría si tu backend lo soporta
-      // Por ahora, solo filtrado simulado
+    // Filter by subcategories
+    if (selectedSubcategories.length > 0) {
+      // En el mock, solo filtrado simulado
       result = result.filter(() => Math.random() > 0.3)
     }
 
     // Filter by price range
-    if (priceRange && priceRange.length === 2) {
-      result = result.filter((product) => product.price >= priceRange[0] && product.price <= priceRange[1])
-    }
+    result = result.filter((product) => product.price >= priceRange[0] && product.price <= priceRange[1])
 
     // Filter by search term
     if (searchTerm) {
@@ -123,9 +119,6 @@ const CatalogPage = () => {
       default:
         break
     }
-
-    // Debug: mostrar cuántos productos hay en cada paso
-    // console.log({ products, result, selectedSubcategories, priceRange, searchTerm, sortBy })
 
     setFilteredProducts(result)
     setCurrentPage(1)

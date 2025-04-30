@@ -3,7 +3,13 @@ import { FiHeart, FiShoppingCart, FiStar } from "react-icons/fi"
 import { Link as RouterLink } from "react-router-dom"
 
 const ProductCard = ({ product }) => {
-  const { id, name, description, price, originalPrice, rating, reviews, image, freeShipping, stock, seller } = product
+  // Usar la primera imagen del arreglo images si existe, si no usar image o placeholder
+  const imageUrl =
+    (Array.isArray(product.images) && product.images.length > 0 && product.images[0]) ||
+    product.image ||
+    "/placeholder.svg"
+
+  const { id, name, description, price, originalPrice, rating, reviews, freeShipping, stock, seller } = product
 
   const cardBg = useColorModeValue("white", "gray.800")
   const borderColor = useColorModeValue("gray.200", "gray.700")
@@ -67,7 +73,7 @@ const ProductCard = ({ product }) => {
       <RouterLink to={`/product/${id}`}>
         <Box position="relative" overflow="hidden" height="200px">
           <Image
-            src={image || "/placeholder.svg"}
+            src={imageUrl}
             alt={name}
             objectFit="contain"
             w="100%"
@@ -75,6 +81,7 @@ const ProductCard = ({ product }) => {
             py={4}
             transition="transform 0.3s"
             _hover={{ transform: "scale(1.05)" }}
+            onError={(e) => { e.target.src = "/placeholder.svg" }}
           />
         </Box>
       </RouterLink>
