@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Box, Heading, SimpleGrid, Button, useColorModeValue, Flex, Text, Skeleton } from "@chakra-ui/react"
 import { FaArrowRight } from "react-icons/fa"
 import { Link as RouterLink } from "react-router-dom"
-import { mockRecommendedProducts } from "../utils/mockData"
+import catalogService from "../../catalog/services/catalogService"
 
 // Importamos el componente ProductCard desde el módulo de catálogo
 // Nota: En una implementación real, este componente debería ser importado desde el módulo de catálogo
@@ -84,11 +84,21 @@ const RecommendedProducts = () => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Simulación de carga de datos
-    setTimeout(() => {
-      setProducts(mockRecommendedProducts)
-      setLoading(false)
-    }, 1000)
+    const fetchRecommendedProducts = async () => {
+      try {
+        setLoading(true)
+        // En una implementación real, esto podría tener un endpoint específico para recomendaciones
+        const data = await catalogService.getProducts({ limit: 4, recommended: true })
+        setProducts(data)
+      } catch (error) {
+        console.error("Error al cargar productos recomendados:", error)
+        setProducts([])
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchRecommendedProducts()
   }, [])
 
   return (

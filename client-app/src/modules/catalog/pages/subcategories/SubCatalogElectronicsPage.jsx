@@ -33,7 +33,7 @@ import { Link as RouterLink } from "react-router-dom"
 import ProductCard from "../../components/ProductCard"
 import Pagination from "../../components/Pagination"
 import FilterSidebar from "../../components/FilterSidebar"
-import { mockProducts } from "../../utils/mockData"
+import catalogService from "../../services/catalogService"
 
 const SubCatalogElectronicsPage = () => {
   const [products, setProducts] = useState([])
@@ -62,23 +62,26 @@ const SubCatalogElectronicsPage = () => {
     "Audio para PC",
   ]
 
-  // Simular carga de productos
+  // Cargar productos desde el backend
   useEffect(() => {
     setIsLoading(true)
-
-    // Filtrar productos de electrónica del mock
-    const electronicsProducts = mockProducts.filter(
-      (product) => product.category.toLowerCase() === categoryName.toLowerCase(),
-    )
-
-    setProducts(electronicsProducts)
-    setFilteredProducts(electronicsProducts)
-
-    const timer = setTimeout(() => {
-      setIsLoading(false)
-    }, 1000)
-
-    return () => clearTimeout(timer)
+    catalogService.getProducts()
+      .then(data => {
+        // Filtrar productos de electrónica
+        const electronicsProducts = data.filter(
+          (product) => product.category.toLowerCase() === categoryName.toLowerCase()
+        )
+        setProducts(electronicsProducts)
+        setFilteredProducts(electronicsProducts)
+      })
+      .catch(error => {
+        console.error("Error al cargar productos:", error)
+        setProducts([])
+        setFilteredProducts([])
+      })
+      .finally(() => {
+        setIsLoading(false)
+      })
   }, [])
 
   // Filtrar productos

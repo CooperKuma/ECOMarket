@@ -33,7 +33,7 @@ import { Link as RouterLink } from "react-router-dom"
 import ProductCard from "../../components/ProductCard"
 import Pagination from "../../components/Pagination"
 import FilterSidebar from "../../components/FilterSidebar"
-import { mockProducts } from "../../utils/mockData"
+import catalogService from "../../services/catalogService"
 
 const SubCatalogMobilePage = () => {
   const [products, setProducts] = useState([])
@@ -62,23 +62,26 @@ const SubCatalogMobilePage = () => {
     "Accesorios",
   ]
 
-  // Simular carga de productos
+  // Cargar productos desde el backend
   useEffect(() => {
     setIsLoading(true)
-
-    // Filtrar productos de celulares del mock
-    const mobileProducts = mockProducts.filter(
-      (product) => product.category.toLowerCase() === categoryName.toLowerCase(),
-    )
-
-    setProducts(mobileProducts)
-    setFilteredProducts(mobileProducts)
-
-    const timer = setTimeout(() => {
-      setIsLoading(false)
-    }, 1000)
-
-    return () => clearTimeout(timer)
+    catalogService.getProducts()
+      .then(data => {
+        // Filtrar productos de celulares
+        const mobileProducts = data.filter(
+          (product) => product.category.toLowerCase() === categoryName.toLowerCase()
+        )
+        setProducts(mobileProducts)
+        setFilteredProducts(mobileProducts)
+      })
+      .catch(error => {
+        console.error("Error al cargar productos:", error)
+        setProducts([])
+        setFilteredProducts([])
+      })
+      .finally(() => {
+        setIsLoading(false)
+      })
   }, [])
 
   // Filtrar productos

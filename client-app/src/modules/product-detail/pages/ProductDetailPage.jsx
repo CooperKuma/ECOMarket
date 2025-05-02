@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
   Box,
   Container,
@@ -17,14 +17,35 @@ import ImageGallery from "../components/ImageGallery"
 import ProductInfo from "../components/ProductInfo"
 import ProductTabs from "../components/ProductTabs"
 import SimilarProducts from "../components/SimilarProducts"
-import { mockProduct } from "../utils/mockData"
+import productService from "../service/productService"
 
 const ProductDetailPage = () => {
   const { id } = useParams()
-  const [product, setProduct] = useState(mockProduct)
+  const [product, setProduct] = useState(null)
+  const [loading, setLoading] = useState(true)
   const textColor = useColorModeValue("gray.800", "white")
   const borderColor = useColorModeValue("gray.200", "gray.700")
   const bgColor = useColorModeValue("white", "gray.800")
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        setLoading(true)
+        const data = await productService.getProductById(id)
+        setProduct(data)
+      } catch (error) {
+        console.error("Error al cargar el producto:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchProduct()
+  }, [id])
+
+  if (loading || !product) {
+    return <div>Cargando...</div>
+  }
 
   return (
     <Container maxW="1400px" px={{ base: 4, md: 6 }} py={6}>
@@ -38,14 +59,6 @@ const ProductDetailPage = () => {
         <BreadcrumbItem>
           <BreadcrumbLink as={RouterLink} to={`/catalog/${product.category.toLowerCase()}`}>
             {product.category}
-          </BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbItem>
-          <BreadcrumbLink
-            as={RouterLink}
-            to={`/catalog/${product.category.toLowerCase()}/${product.subcategory.toLowerCase()}`}
-          >
-            {product.subcategory}
           </BreadcrumbLink>
         </BreadcrumbItem>
         <BreadcrumbItem isCurrentPage>

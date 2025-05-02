@@ -32,7 +32,6 @@ import CartSummary from "../components/CartSummary"
 import ShippingOptions from "../components/ShippingOptions"
 import EmptyCart from "../components/EmptyCart"
 import RecommendedProducts from "../components/RecommendedProducts"
-import { mockCartItems } from "../utils/mockData"
 
 const CartPage = () => {
   const [cartItems, setCartItems] = useState([])
@@ -42,10 +41,27 @@ const CartPage = () => {
   const toast = useToast()
 
   useEffect(() => {
-    setTimeout(() => {
-      setCartItems(mockCartItems)
-      setLoading(false)
-    }, 800)
+    const fetchCartItems = async () => {
+      try {
+        setLoading(true)
+        const response = await fetch('/api/cart')
+        const data = await response.json()
+        setCartItems(data)
+      } catch (error) {
+        console.error('Error fetching cart items:', error)
+        toast({
+          title: "Error",
+          description: "No se pudo cargar el carrito",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        })
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchCartItems()
   }, [])
 
   const subtotal = cartItems.reduce((total, item) => total + item.price * item.quantity, 0)
