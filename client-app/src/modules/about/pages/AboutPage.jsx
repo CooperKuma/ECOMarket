@@ -36,7 +36,7 @@ import {
 
 const AboutPage = () => {
   // Colores según el tema
-  const bgColor = useColorModeValue("white", "gray.800")
+  const bgColor = useColorModeValue("gray.50", "gray.800")
   const cardBgColor = useColorModeValue("bg.card", "bg.card")
   const borderColor = useColorModeValue("border.default", "border.default")
   const accentColor = useColorModeValue("accent.primary", "accent.primary")
@@ -187,7 +187,7 @@ const AboutPage = () => {
             </Box>
             <Flex justify="center">
               <Image
-                src="/placeholder.svg?height=400&width=500"
+                src="/equipo_desarrollo.jpg?height=400&width=500"
                 alt="Equipo de EcoMarket"
                 borderRadius="lg"
                 boxShadow="xl"
@@ -252,7 +252,7 @@ const AboutPage = () => {
       {/* Estadísticas */}
       <Box bg="brand.primary.50" py={16}>
         <Container maxW="1200px">
-          <Heading as="h2" size="xl" mb={10} textAlign="center" color={textColor}>
+          <Heading as="h2" size="xl" mb={10} textAlign="center" color={accentColor}>
             Nuestro Impacto
           </Heading>
           <SimpleGrid columns={{ base: 1, sm: 2, md: 4 }} spacing={8}>

@@ -24,6 +24,7 @@ export const useCatalog = (initialParams = {}) => {
   const fetchCategories = useCallback(async () => {
     try {
       const data = await catalogService.getCategories()
+      console.log("Categorías obtenidas:", data)
       setCategories(data)
     } catch (err) {
       setError(err.response?.data?.message || "Error al cargar las categorías")
@@ -45,6 +46,7 @@ export const useCatalog = (initialParams = {}) => {
 
   useEffect(() => {
     fetchProducts(filters)
+    console.log("Filtros actualizados:", filters)
   }, [filters, fetchProducts])
 
   useEffect(() => {

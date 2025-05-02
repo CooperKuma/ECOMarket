@@ -11,12 +11,17 @@ API.interceptors.request.use((config) => {
   return config
 })
 
-export const getProductById = (id) =>
-  API.get(`/products/${id}`).then((res) => res.data)
-
-const catalogService = {
-  getProducts,
+export const getProductById = async (id) => {
+  try {
+    const res = await API.get(`/products/${id}`)
+    return res.data
+  } catch (error) {
+    console.warn("Fallo conexión con API. Usando producto mock:", error.message)
+    return mockProducts.find((p) => p.id === Number(id)) || null
+  }
+}
+  const catalogService = {
   getProductById,
- }
+}
 
 export default catalogService

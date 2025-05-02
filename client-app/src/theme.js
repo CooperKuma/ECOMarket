@@ -45,12 +45,12 @@ const theme = extendTheme({
   semanticTokens: {
     colors: {
       "bg.body": {
-        default: "white",
+        default: "gray.200",
         _dark: "gray.900",
       },
       "bg.card": {
-        default: "white",
-        _dark: "gray.800",
+        default: "gray.50",
+        _dark: "gray.700",
       },
       "bg.surface": {
         default: "gray.50",
@@ -62,11 +62,11 @@ const theme = extendTheme({
       },
       "text.secondary": {
         default: "gray.600",
-        _dark: "gray.400",
+        _dark: "gray.200",
       },
       "border.default": {
         default: "gray.200",
-        _dark: "gray.700",
+        _dark: "gray.600",
       },
       "accent.primary": {
         default: "brand.primary.500",

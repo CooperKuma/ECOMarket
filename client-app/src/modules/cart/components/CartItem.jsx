@@ -23,11 +23,20 @@ import { FaTrash, FaHeart } from "react-icons/fa"
 const CartItem = ({ item, onQuantityChange, onRemove }) => {
   const [isHovering, setIsHovering] = useState(false)
 
-  // Colores según el tema
-  const bgHover = useColorModeValue("gray.50", "gray.700")
-  const textColor = useColorModeValue("gray.700", "gray.200")
-  const secondaryTextColor = useColorModeValue("gray.600", "gray.400")
-  const accentColor = useColorModeValue("brand.primary.500", "brand.primary.300")
+  // Colores según el tema usando tokens semánticos
+  const bgHover = useColorModeValue("bg.surface", "gray.700")
+  const borderColor = useColorModeValue("border.default", "border.default")
+  const textColor = useColorModeValue("text.primary", "text.primary")
+  const secondaryTextColor = useColorModeValue("text.secondary", "text.secondary")
+  const accentColor = useColorModeValue("accent.primary", "accent.primary")
+
+  // Colores para los botones de acción
+  const heartColor = useColorModeValue("brand.secondary.600", "brand.secondary.300")
+  const trashColor = useColorModeValue("brand.primary.700", "brand.primary.300")
+
+  // Color para el badge de descuento
+  const discountBgColor = useColorModeValue("brand.secondary.500", "brand.secondary.400")
+  const discountTextColor = useColorModeValue("white", "gray.900")
 
   // Calcular subtotal del item
   const subtotal = item.price * item.quantity
@@ -35,6 +44,9 @@ const CartItem = ({ item, onQuantityChange, onRemove }) => {
   // Calcular descuento si existe
   const discountedPrice = item.discount ? item.price * (1 - item.discount / 100) : null
   const discountedSubtotal = discountedPrice ? discountedPrice * item.quantity : null
+
+  // Color para el aviso de stock bajo
+  const stockWarningColor = useColorModeValue("brand.secondary.600", "brand.secondary.300")
 
   return (
     <Flex
@@ -59,14 +71,15 @@ const CartItem = ({ item, onQuantityChange, onRemove }) => {
             objectFit="contain"
             borderRadius="md"
             border="1px solid"
-            borderColor={useColorModeValue("gray.200", "gray.700")}
+            borderColor={borderColor}
           />
           {item.discount > 0 && (
             <Badge
               position="absolute"
               top="0"
               right="0"
-              colorScheme="red"
+              bg={discountBgColor}
+              color={discountTextColor}
               borderRadius="full"
               px={2}
               transform="translate(30%, -30%)"
@@ -107,7 +120,7 @@ const CartItem = ({ item, onQuantityChange, onRemove }) => {
           )}
 
           {item.stock < 10 && (
-            <Text fontSize="xs" color="orange.500" fontWeight="medium" mt={1}>
+            <Text fontSize="xs" color={stockWarningColor} fontWeight="medium" mt={1}>
               ¡Solo quedan {item.stock} unidades!
             </Text>
           )}
@@ -123,6 +136,7 @@ const CartItem = ({ item, onQuantityChange, onRemove }) => {
           max={item.stock}
           value={item.quantity}
           onChange={(_, value) => onQuantityChange(item.id, value)}
+          borderColor={borderColor}
         >
           <NumberInputField textAlign="center" />
           <NumberInputStepper>
@@ -145,7 +159,9 @@ const CartItem = ({ item, onQuantityChange, onRemove }) => {
               </Text>
             </>
           ) : (
-            <Text fontWeight="bold">${item.price.toLocaleString()}</Text>
+            <Text fontWeight="bold" color={textColor}>
+              ${item.price.toLocaleString()}
+            </Text>
           )}
         </Box>
       </Flex>
@@ -163,7 +179,9 @@ const CartItem = ({ item, onQuantityChange, onRemove }) => {
               </Text>
             </>
           ) : (
-            <Text fontWeight="bold">${subtotal.toLocaleString()}</Text>
+            <Text fontWeight="bold" color={textColor}>
+              ${subtotal.toLocaleString()}
+            </Text>
           )}
         </Box>
       </Flex>
@@ -174,7 +192,11 @@ const CartItem = ({ item, onQuantityChange, onRemove }) => {
           <IconButton
             icon={<FaHeart />}
             variant="ghost"
-            colorScheme="pink"
+            color={heartColor}
+            _hover={{
+              bg: useColorModeValue("brand.secondary.50", "brand.secondary.900"),
+              color: useColorModeValue("brand.secondary.700", "brand.secondary.200"),
+            }}
             size="sm"
             aria-label="Guardar para después"
           />
@@ -183,7 +205,11 @@ const CartItem = ({ item, onQuantityChange, onRemove }) => {
           <IconButton
             icon={<FaTrash />}
             variant="ghost"
-            colorScheme="red"
+            color={trashColor}
+            _hover={{
+              bg: useColorModeValue("brand.primary.50", "brand.primary.900"),
+              color: useColorModeValue("brand.primary.800", "brand.primary.200"),
+            }}
             size="sm"
             aria-label="Eliminar"
             onClick={() => onRemove(item.id)}

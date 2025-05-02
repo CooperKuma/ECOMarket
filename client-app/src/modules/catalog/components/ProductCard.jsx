@@ -11,7 +11,7 @@ const ProductCard = ({ product }) => {
 
   const { id, name, description, price, originalPrice, rating, reviews, freeShipping, stock, seller } = product
 
-  const cardBg = useColorModeValue("white", "gray.800")
+  const cardBg = useColorModeValue("gray.50", "gray.800")
   const borderColor = useColorModeValue("gray.200", "gray.700")
   const textColor = useColorModeValue("gray.800", "white")
   const secondaryTextColor = useColorModeValue("gray.600", "gray.400")

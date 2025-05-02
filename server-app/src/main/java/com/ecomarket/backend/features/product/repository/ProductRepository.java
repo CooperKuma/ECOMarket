@@ -9,4 +9,5 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     List<Product> findByCategoryContainingIgnoreCaseAndNameContainingIgnoreCase(String category, String name);
     List<Product> findTop4ByCategoryAndIdNot(String category, Long id);
+
 }

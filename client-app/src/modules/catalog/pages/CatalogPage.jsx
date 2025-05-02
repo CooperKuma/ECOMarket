@@ -2,39 +2,21 @@
 
 import { useState, useEffect } from "react"
 import {
-  Box,
-  Container,
-  Grid,
-  GridItem,
-  Heading,
-  Text,
-  Flex,
-  Button,
-  Select,
-  Input,
-  InputGroup,
-  InputLeftElement,
-  Badge,
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  useColorModeValue,
-  Skeleton,
-  useDisclosure,
-  Drawer,
-  DrawerBody,
-  DrawerHeader,
-  DrawerOverlay,
-  DrawerContent,
-  DrawerCloseButton,
+  Box, Container, Grid, GridItem, Heading, Text, Flex, Button, Select, Input,
+  InputGroup, InputLeftElement, Breadcrumb, BreadcrumbItem, BreadcrumbLink,
+  useColorModeValue, Skeleton, useDisclosure, Drawer, DrawerBody, DrawerHeader,
+  DrawerOverlay, DrawerContent, DrawerCloseButton
 } from "@chakra-ui/react"
-import { FiSearch, FiFilter, FiChevronRight, FiX } from "react-icons/fi"
+import { FiSearch, FiFilter, FiChevronRight } from "react-icons/fi"
 import { useParams, Link as RouterLink } from "react-router-dom"
 import ProductCard from "../components/ProductCard"
 import Pagination from "../components/Pagination"
 import FilterSidebar from "../components/FilterSidebar"
 import catalogService from "../services/catalogService"
-import { mockProducts, categories } from "../utils/mockData"
+import { toSpanishCategory } from "../../../utils/categoryTranslator"
+
+const normalize = (str) =>
+  str?.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim()
 
 const CatalogPage = () => {
   const { category } = useParams()
@@ -54,55 +36,56 @@ const CatalogPage = () => {
   const bgColor = useColorModeValue("white", "gray.800")
   const borderColor = useColorModeValue("gray.200", "gray.700")
   const textColor = useColorModeValue("gray.800", "white")
-  const accentColor = useColorModeValue("brand.primary.500", "brand.primary.300")
 
-  const categoryInfo = category ? categories[category] : null
-  const categoryName = categoryInfo ? categoryInfo.name : "Todos los productos"
-  const subcategories = categoryInfo ? categoryInfo.subcategories : []
+  const categoryDisplayName = toSpanishCategory(category || "Todos los productos")
 
-  // Fetch products from backend
   useEffect(() => {
-    setIsLoading(true)
-    catalogService.getProducts()
-      .then(data => {
+    const fetchProducts = async () => {
+      try {
+        setIsLoading(true)
+        const data = await catalogService.getProducts()
         setProducts(data)
-        setFilteredProducts(data)
+      } catch (err) {
+        console.error("Error al cargar productos del backend", err)
+        setProducts([])
+      } finally {
         setIsLoading(false)
-      })
-      .catch(() => {
-        setProducts(mockProducts)
-        setFilteredProducts(mockProducts)
-        setIsLoading(false)
-      })
+      }
+    }
+
+    fetchProducts()
   }, [])
 
   useEffect(() => {
-    let result = [...products]
+    let result = Array.isArray(products) ? [...products] : []
 
-    // Filter by category
     if (category && category !== "all") {
-      result = result.filter((product) => product.category && product.category.toLowerCase() === categoryName.toLowerCase())
+      const spanishCategory = toSpanishCategory(category)
+      result = result.filter(
+        (product) =>
+          product.category &&
+          normalize(product.category) === normalize(spanishCategory)
+      )
     }
+    
 
-    // Filter by subcategories
     if (selectedSubcategories.length > 0) {
-      // En el mock, solo filtrado simulado
-      result = result.filter(() => Math.random() > 0.3)
+      result = result.filter(() => Math.random() > 0.3) // lógica temporal
     }
 
-    // Filter by price range
-    result = result.filter((product) => product.price >= priceRange[0] && product.price <= priceRange[1])
+    result = result.filter(
+      (product) =>
+        product.price >= priceRange[0] && product.price <= priceRange[1]
+    )
 
-    // Filter by search term
     if (searchTerm) {
       result = result.filter(
         (product) =>
           product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          product.description.toLowerCase().includes(searchTerm.toLowerCase()),
+          product.description.toLowerCase().includes(searchTerm.toLowerCase())
       )
     }
 
-    // Sort products
     switch (sortBy) {
       case "price_asc":
         result.sort((a, b) => a.price - b.price)
@@ -111,7 +94,7 @@ const CatalogPage = () => {
         result.sort((a, b) => b.price - a.price)
         break
       case "rating":
-        result.sort((a, b) => (Number.parseFloat(b.rating || 0) - Number.parseFloat(a.rating || 0)))
+        result.sort((a, b) => (parseFloat(b.rating || 0) - parseFloat(a.rating || 0)))
         break
       case "newest":
         result.sort(() => Math.random() - 0.5)
@@ -122,17 +105,14 @@ const CatalogPage = () => {
 
     setFilteredProducts(result)
     setCurrentPage(1)
-  }, [category, selectedSubcategories, priceRange, sortBy, searchTerm, categoryName, products])
+  }, [category, selectedSubcategories, priceRange, sortBy, searchTerm, products])
 
-  // Get current products for pagination
   const indexOfLastProduct = currentPage * productsPerPage
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage
   const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct)
 
-  // Change page
   const paginate = (pageNumber) => setCurrentPage(pageNumber)
 
-  // Handle subcategory selection
   const handleSubcategoryChange = (subcategory) => {
     if (selectedSubcategories.includes(subcategory)) {
       setSelectedSubcategories(selectedSubcategories.filter((item) => item !== subcategory))
@@ -141,7 +121,6 @@ const CatalogPage = () => {
     }
   }
 
-  // Reset filters
   const resetFilters = () => {
     setPriceRange([0, 50000])
     setSelectedSubcategories([])
@@ -151,48 +130,27 @@ const CatalogPage = () => {
 
   return (
     <Container maxW="1400px" px={{ base: 4, md: 6 }} py={6}>
-      {/* Breadcrumbs */}
-      <Breadcrumb separator={<FiChevronRight color="gray.500" />} mb={4} fontSize="sm" color={textColor}>
+      <Breadcrumb separator={<FiChevronRight />} mb={4} fontSize="sm" color={textColor}>
         <BreadcrumbItem>
-          <BreadcrumbLink as={RouterLink} to="/">
-            Inicio
-          </BreadcrumbLink>
+          <BreadcrumbLink as={RouterLink} to="/">Inicio</BreadcrumbLink>
         </BreadcrumbItem>
         {category && category !== "all" && (
           <BreadcrumbItem isCurrentPage>
-            <BreadcrumbLink>{categoryName}</BreadcrumbLink>
+            <BreadcrumbLink>{categoryDisplayName}</BreadcrumbLink>
           </BreadcrumbItem>
         )}
       </Breadcrumb>
 
-      {/* Category Title */}
-      <Flex
-        justify="space-between"
-        align="center"
-        mb={6}
-        direction={{ base: "column", md: "row" }}
-        gap={{ base: 4, md: 0 }}
-      >
+      <Flex justify="space-between" align="center" mb={6} direction={{ base: "column", md: "row" }} gap={{ base: 4, md: 0 }}>
         <Box>
-          <Heading size="lg">{categoryName}</Heading>
-          <Text color="gray.500" mt={1}>
-            {filteredProducts.length} productos encontrados
-          </Text>
+          <Heading size="lg">{categoryDisplayName}</Heading>
+          <Text color="gray.500" mt={1}>{filteredProducts.length} productos encontrados</Text>
         </Box>
 
-        {/* Mobile Filter Button */}
-        <Button
-          leftIcon={<FiFilter />}
-          onClick={onOpen}
-          display={{ base: "flex", md: "none" }}
-          colorScheme="blue"
-          variant="outline"
-          width="full"
-        >
+        <Button leftIcon={<FiFilter />} onClick={onOpen} display={{ base: "flex", md: "none" }} colorScheme="blue" variant="outline" width="full">
           Filtros
         </Button>
 
-        {/* Sort Dropdown - Desktop */}
         <Box display={{ base: "none", md: "block" }} minW="200px">
           <Select value={sortBy} onChange={(e) => setSortBy(e.target.value)} bg={bgColor} borderColor={borderColor}>
             <option value="relevance">Más relevantes</option>
@@ -204,14 +162,13 @@ const CatalogPage = () => {
         </Box>
       </Flex>
 
-      {/* Mobile Search */}
-      <Box mb={6} display={{ base: "block", md: "none" }}>
+      <Box mb={6}>
         <InputGroup>
           <InputLeftElement pointerEvents="none">
             <FiSearch color="gray.300" />
           </InputLeftElement>
           <Input
-            placeholder="Buscar en esta categoría..."
+            placeholder="Buscar productos..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             bg={bgColor}
@@ -220,118 +177,41 @@ const CatalogPage = () => {
         </InputGroup>
       </Box>
 
-      {/* Sort Dropdown - Mobile */}
-      <Box mb={6} display={{ base: "block", md: "none" }}>
-        <Select value={sortBy} onChange={(e) => setSortBy(e.target.value)} bg={bgColor} borderColor={borderColor}>
-          <option value="relevance">Más relevantes</option>
-          <option value="price_asc">Menor precio</option>
-          <option value="price_desc">Mayor precio</option>
-          <option value="rating">Mejor calificados</option>
-          <option value="newest">Más recientes</option>
-        </Select>
-      </Box>
-
-      {/* Main Content */}
       <Grid templateColumns={{ base: "1fr", md: "250px 1fr" }} gap={6}>
-        {/* Filters - Desktop */}
         <GridItem display={{ base: "none", md: "block" }}>
-          <Box
-            p={4}
-            bg={bgColor}
-            borderRadius="md"
-            borderWidth="1px"
-            borderColor={borderColor}
-            position="sticky"
-            top="100px"
-          >
+          <Box p={4} bg={bgColor} borderRadius="md" borderWidth="1px" borderColor={borderColor} position="sticky" top="100px">
             <FilterSidebar
               priceRange={priceRange}
               setPriceRange={setPriceRange}
               selectedSubcategories={selectedSubcategories}
               handleSubcategoryChange={handleSubcategoryChange}
-              subcategories={subcategories}
+              subcategories={[]} // Implementar subcategorías reales si se necesitan
               resetFilters={resetFilters}
             />
           </Box>
         </GridItem>
 
-        {/* Products Grid */}
         <GridItem>
-          {/* Desktop Search */}
-          <Box mb={6} display={{ base: "none", md: "block" }}>
-            <InputGroup>
-              <InputLeftElement pointerEvents="none">
-                <FiSearch color="gray.300" />
-              </InputLeftElement>
-              <Input
-                placeholder="Buscar en esta categoría..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                bg={bgColor}
-                borderColor={borderColor}
-              />
-            </InputGroup>
-          </Box>
-
-          {/* Selected Filters */}
-          {(selectedSubcategories.length > 0 || searchTerm) && (
-            <Flex wrap="wrap" gap={2} mb={4}>
-              {selectedSubcategories.map((subcat) => (
-                <Badge
-                  key={subcat}
-                  py={1}
-                  px={2}
-                  borderRadius="full"
-                  colorScheme="blue"
-                  display="flex"
-                  alignItems="center"
-                >
-                  {subcat}
-                  <Box as="span" ml={1} cursor="pointer" onClick={() => handleSubcategoryChange(subcat)}>
-                    <FiX />
-                  </Box>
-                </Badge>
-              ))}
-
-              {searchTerm && (
-                <Badge py={1} px={2} borderRadius="full" colorScheme="blue" display="flex" alignItems="center">
-                  Búsqueda: {searchTerm}
-                  <Box as="span" ml={1} cursor="pointer" onClick={() => setSearchTerm("")}>
-                    <FiX />
-                  </Box>
-                </Badge>
-              )}
-            </Flex>
-          )}
-
-          {/* Products Grid */}
           {isLoading ? (
-            <Grid templateColumns={{ base: "repeat(1, 1fr)", sm: "repeat(2, 1fr)", lg: "repeat(3, 1fr)" }} gap={6}>
-              {Array(6)
-                .fill(null)
-                .map((_, index) => (
-                  <Skeleton key={index} height="350px" borderRadius="md" />
-                ))}
+            <Grid templateColumns="repeat(auto-fill, minmax(280px, 1fr))" gap={6}>
+              {Array(6).fill(null).map((_, index) => (
+                <Skeleton key={index} height="350px" borderRadius="md" />
+              ))}
             </Grid>
           ) : filteredProducts.length === 0 ? (
             <Box p={8} textAlign="center" bg={bgColor} borderRadius="md" borderWidth="1px" borderColor={borderColor}>
-              <Heading size="md" mb={4}>
-                No se encontraron productos
-              </Heading>
+              <Heading size="md" mb={4}>No se encontraron productos</Heading>
               <Text mb={6}>Intenta con otros filtros o términos de búsqueda</Text>
-              <Button colorScheme="blue" onClick={resetFilters}>
-                Limpiar filtros
-              </Button>
+              <Button colorScheme="blue" onClick={resetFilters}>Limpiar filtros</Button>
             </Box>
           ) : (
-            <Grid templateColumns={{ base: "repeat(1, 1fr)", sm: "repeat(2, 1fr)", lg: "repeat(3, 1fr)" }} gap={6}>
+            <Grid templateColumns="repeat(auto-fill, minmax(280px, 1fr))" gap={6}>
               {currentProducts.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </Grid>
           )}
 
-          {/* Pagination */}
           {filteredProducts.length > 0 && (
             <Box mt={8}>
               <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={paginate} />
@@ -340,21 +220,18 @@ const CatalogPage = () => {
         </GridItem>
       </Grid>
 
-      {/* Mobile Filter Drawer */}
       <Drawer isOpen={isOpen} placement="left" onClose={onClose} size="xs">
         <DrawerOverlay />
         <DrawerContent bg={bgColor}>
           <DrawerCloseButton />
-          <DrawerHeader borderBottomWidth="1px" borderColor={borderColor}>
-            Filtros
-          </DrawerHeader>
+          <DrawerHeader borderBottomWidth="1px" borderColor={borderColor}>Filtros</DrawerHeader>
           <DrawerBody py={4}>
             <FilterSidebar
               priceRange={priceRange}
               setPriceRange={setPriceRange}
               selectedSubcategories={selectedSubcategories}
               handleSubcategoryChange={handleSubcategoryChange}
-              subcategories={subcategories}
+              subcategories={[]}
               resetFilters={resetFilters}
             />
           </DrawerBody>

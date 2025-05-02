@@ -58,7 +58,9 @@ const Sidebar = () => {
   if (!auth) return null
 
   return (
+    
     <Box
+    
       as="nav"
       position="fixed"
       top="60px"
@@ -74,6 +76,13 @@ const Sidebar = () => {
       zIndex="sticky"
     >
       <VStack spacing="2" align="stretch" py="4">
+       <NavItem
+              icon={FaHome} 
+              to="/" 
+              isActive={location.pathname === "/"}
+              >
+                Inicio
+        </NavItem>            
         <NavItem 
           icon={FaHome} 
           to="/dashboard" 

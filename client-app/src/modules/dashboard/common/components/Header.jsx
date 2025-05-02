@@ -14,7 +14,6 @@ import {
   Badge,
   HStack,
   useColorModeValue,
-  Button,
   InputGroup,
   InputLeftElement,
   Input
@@ -34,13 +33,19 @@ import {
 import { useDashboardContext } from "../../context/DashboardContext"
 import { useAuth } from "../../../auth/hooks/useAuth"
 import { Link as RouterLink } from "react-router-dom"
+import { Image } from "@chakra-ui/react";
 
 const Header = () => {
   const { toggleSidebar, sidebarOpen } = useDashboardContext()
   const { auth, logout } = useAuth()
   const { colorMode, toggleColorMode } = useColorMode()
-  const bgColor = useColorModeValue("white", "gray.800")
-  const borderColor = useColorModeValue("gray.200", "gray.700")
+  const bgColor = useColorModeValue("brand.primary.900", "brand.primary.900")
+  const textColor = useColorModeValue("white", "white")
+  const borderColor = useColorModeValue("brand.primary.300", "brand.primary.800")
+  const searchBgColor = useColorModeValue("bg.card", "bg.surface")
+  const searchTextColor = useColorModeValue("text.primary", "text.primary")
+  const searchPlaceholderColor = useColorModeValue("text.secondary", "text.secondary")
+  
 
   const roleBadgeColors = {
     buyer: "green",
@@ -70,32 +75,28 @@ const Header = () => {
           variant="ghost"
           mr={4}
         />
-        <Button
-          as={RouterLink}
-          to="/"
-          leftIcon={<FaHome />}
-          variant="ghost"
-          mr={4}
-          size="sm"
-        >
-          Inicio
-        </Button>
-        
-        <Text 
-          fontSize="xl" 
-          fontWeight="bold" 
-          color="accent.primary" 
-          display={{ base: "none", md: "block" }}
-        >
-          ECOMarket
-        </Text>
+               
+         <Image src="/logo.svg" alt="EcoMarket logo"
+                    height="30px" // o boxSize="70px"
+                    width="auto"
+                    mr="2"/>
       </Flex>
 
       <InputGroup maxW="500px" mx={4} display={{ base: "none", md: "block" }}>
         <InputLeftElement pointerEvents="none">
           <FaSearch color="gray.300" />
         </InputLeftElement>
-        <Input placeholder="Buscar productos, marcas y más..." borderRadius="full" />
+        <Input 
+          placeholder="Buscar productos, marcas y más..." 
+          borderRadius="full" 
+          bg={searchBgColor}
+          color={searchTextColor}
+          _placeholder={{ color: searchPlaceholderColor }}
+          _focus={{
+            borderColor: "brand.secondary.400",
+            boxShadow: "0 0 0 1px var(--chakra-colors-brand-secondary-400)",
+          }}
+        />
       </InputGroup>
 
       <HStack spacing={3}>
@@ -114,7 +115,7 @@ const Header = () => {
         </Box>
 
         <Box position="relative" display={{ base: "none", sm: "block" }}>
-          <IconButton aria-label="Carrito" icon={<FaShoppingCart />} variant="ghost" />
+        <IconButton as={RouterLink} to="/cart" aria-label="Carrito" icon={<FaShoppingCart />} variant="ghost" />
           <Badge position="absolute" top="-1" right="-1" colorScheme="green" borderRadius="full" fontSize="xs">
             2
           </Badge>

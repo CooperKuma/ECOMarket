@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { Link as RouterLink, useLocation } from "react-router-dom"
+import { Image } from "@chakra-ui/react"
 import {
   Box,
   Flex,
@@ -16,7 +17,6 @@ import {
   PopoverTrigger,
   PopoverContent,
   useColorModeValue,
-  useBreakpointValue,
   useDisclosure,
   useColorMode,
   Input,
@@ -58,6 +58,8 @@ import {
   FaInfoCircle,
 } from "react-icons/fa"
 import { useAuth } from "../modules/auth/hooks/useAuth.js" // Asumiendo que tienes un AuthContext
+import { getAllCategories } from "../utils/categoryTranslator.js"
+
 
 const Navbar = () => {
   const { isOpen, onToggle } = useDisclosure()
@@ -81,13 +83,33 @@ const Navbar = () => {
   }, [])
 
   // Colores según el tema
-  const bgColor = useColorModeValue(
-    isScrolled ? "white" : "rgba(255, 255, 255, 0.8)",
-    isScrolled ? "gray.800" : "rgba(26, 32, 44, 0.8)",
-  )
-  const textColor = useColorModeValue("text.primary", "text.primary")
-  const borderColor = useColorModeValue("border.default", "border.default")
-  const searchBgColor = useColorModeValue("bg.surface", "bg.surface")
+  const scrolledBgColor = useColorModeValue("brand.primary.900", "brand.primary.900")
+  const defaultBgColor = useColorModeValue("brand.primary.900", "brand.primary.900")
+  const bgColor = isScrolled ? scrolledBgColor : defaultBgColor
+
+  const textColor = useColorModeValue("white", "white")
+  const borderColor = useColorModeValue("brand.primary.300", "brand.primary.800")
+  const searchBgColor = useColorModeValue("bg.card", "bg.surface")
+  const searchTextColor = useColorModeValue("text.primary", "text.primary")
+  const searchPlaceholderColor = useColorModeValue("text.secondary", "text.secondary")
+
+  // Colores para botones
+  const ghostButtonColor = useColorModeValue("white", "white")
+  const ghostButtonHoverBg = useColorModeValue("brand.secondary.300", "brand.primary.800")
+  const primaryButtonBg = useColorModeValue("brand.secondary.400", "brand.secondary.500")
+  const primaryButtonHoverBg = useColorModeValue("brand.secondary.500", "brand.secondary.600")
+  const iconButtonHoverBg = useColorModeValue("brand.secondary.300", "brand.primary.800")
+
+  // Color para badge
+  const badgeBg = useColorModeValue("brand.secondary.400", "brand.secondary.500")
+
+  const accountIconColor = useColorModeValue("brand.secondary.600", "brand.secondary.300")
+  const accountTextColor = useColorModeValue("brand.secondary.800", "text.primary")
+  const accountMenuItemHoverBg = useColorModeValue("brand.secondary.50", "gray.700")
+  const menuDividerColor = useColorModeValue("brand.secondary.200", "gray.700")
+  const logoutIconColor = useColorModeValue("red.500", "red.300")
+  const logoutTextColor = useColorModeValue("red.600", "red.300")
+  const logoutHoverBg = useColorModeValue("red.50", "red.900")
 
   return (
     <Box
@@ -107,21 +129,13 @@ const Navbar = () => {
         <Flex py={{ base: 2, md: 3 }} px={{ base: 4, md: 0 }} align="center">
           {/* Logo */}
           <Flex flex={{ base: 1 }} justify={{ base: "start", md: "start" }}>
-            <Text
-              as={RouterLink}
-              to="/"
-              textAlign={useBreakpointValue({ base: "center", md: "left" })}
-              fontFamily="heading"
-              fontWeight="bold"
-              fontSize="xl"
-              color="accent.primary"
-            >
-              EcoMarket
-            </Text>
+            <Link href="http://localhost:5173">
+              <Image src="/logo.svg" alt="EcoMarket logo" height="30px" width="auto" mr="2" />
+            </Link>
 
             {/* Desktop Navigation */}
             <Flex display={{ base: "none", md: "flex" }} ml={10}>
-              <DesktopNav />
+              <DesktopNav textColor={textColor} hoverColor={ghostButtonHoverBg} />
             </Flex>
           </Flex>
 
@@ -138,13 +152,31 @@ const Navbar = () => {
               aria-label={colorMode === "light" ? "Modo oscuro" : "Modo claro"}
               icon={colorMode === "light" ? <FaMoon /> : <FaSun />}
               variant="ghost"
+              color={ghostButtonColor}
+              _hover={{ bg: iconButtonHoverBg }}
               onClick={toggleColorMode}
             />
 
             {/* Cart */}
             <Box position="relative" display={{ base: "none", sm: "block" }}>
-              <IconButton as={RouterLink} to="/cart" aria-label="Carrito" icon={<FaShoppingCart />} variant="ghost" />
-              <Badge position="absolute" top="-1" right="-1" colorScheme="blue" borderRadius="full" fontSize="xs">
+              <IconButton
+                as={RouterLink}
+                to="/cart"
+                aria-label="Carrito"
+                icon={<FaShoppingCart />}
+                variant="ghost"
+                color={ghostButtonColor}
+                _hover={{ bg: iconButtonHoverBg }}
+              />
+              <Badge
+                position="absolute"
+                top="-1"
+                right="-1"
+                bg={badgeBg}
+                color="white"
+                borderRadius="full"
+                fontSize="xs"
+              >
                 2
               </Badge>
             </Box>
@@ -155,15 +187,36 @@ const Navbar = () => {
                 <MenuButton as={Button} rounded="full" variant="link" cursor="pointer" minW={0}>
                   <Avatar size="sm" src="https://bit.ly/broken-link" name={user?.name} />
                 </MenuButton>
-                <MenuList zIndex={1001}>
-                  <MenuItem as={RouterLink} to="/dashboard" icon={<FaUser />}>
-                    Mi cuenta
+                <MenuList
+                  zIndex={1001}
+                  bg={useColorModeValue("white", "bg.card")}
+                  borderColor={useColorModeValue("brand.secondary.300", "border.default")}
+                  boxShadow="lg"
+                >
+                  <MenuItem
+                    as={RouterLink}
+                    to="/dashboard"
+                    icon={<FaUser color={accountIconColor} />}
+                    _hover={{ bg: accountMenuItemHoverBg }}
+                  >
+                    <Text color={accountTextColor}>Mi cuenta</Text>
                   </MenuItem>
-                  <MenuItem as={RouterLink} to="/dashboard/orders" icon={<FaShoppingCart />}>
-                    Mis compras
+                  <MenuItem
+                    as={RouterLink}
+                    to="/dashboard/orders"
+                    icon={<FaShoppingCart color={accountIconColor} />}
+                    _hover={{ bg: accountMenuItemHoverBg }}
+                  >
+                    <Text color={accountTextColor}>Mis compras</Text>
                   </MenuItem>
-                  <MenuDivider />
-                  <MenuItem onClick={logout}>Cerrar sesión</MenuItem>
+                  <MenuDivider borderColor={menuDividerColor} />
+                  <MenuItem
+                    onClick={logout}
+                    _hover={{ bg: logoutHoverBg }}
+                    icon={<Icon as={FaSignInAlt} color={logoutIconColor} />}
+                  >
+                    <Text color={logoutTextColor}>Cerrar sesión</Text>
+                  </MenuItem>
                 </MenuList>
               </Menu>
             ) : (
@@ -173,7 +226,9 @@ const Navbar = () => {
                 display={{ base: "none", md: "inline-flex" }}
                 fontSize="sm"
                 fontWeight={600}
-                colorScheme="blue"
+                bg={primaryButtonBg}
+                color="white"
+                _hover={{ bg: primaryButtonHoverBg }}
                 leftIcon={<FaSignInAlt />}
               >
                 Ingresar
@@ -186,6 +241,8 @@ const Navbar = () => {
               onClick={onToggle}
               icon={isOpen ? <FaTimes /> : <FaBars />}
               variant="ghost"
+              color={ghostButtonColor}
+              _hover={{ bg: iconButtonHoverBg }}
               aria-label="Toggle Navigation"
             />
           </Stack>
@@ -205,7 +262,13 @@ const Navbar = () => {
           {/* Categories Menu */}
           <Popover trigger="hover" placement="bottom-start">
             <PopoverTrigger>
-              <Button rightIcon={<FaChevronDown />} colorScheme="blue" variant="ghost" fontWeight={500}>
+              <Button
+                rightIcon={<FaChevronDown />}
+                variant="ghost"
+                fontWeight={500}
+                color={ghostButtonColor}
+                _hover={{ bg: ghostButtonHoverBg }}
+              >
                 Categorías
               </Button>
             </PopoverTrigger>
@@ -218,30 +281,33 @@ const Navbar = () => {
               minW="sm"
             >
               <SimpleGrid columns={2} spacing={2}>
-                <CategoryItem icon={FaLaptop} label="Electrónica" href="/catalog/electronics" />
-                <CategoryItem icon={FaMobile} label="Celulares" href="/catalog/mobile" />
-                <CategoryItem icon={FaTshirt} label="Moda" href="/catalog/fashion" />
-                <CategoryItem icon={FaHome} label="Hogar" href="/catalog/home" />
-                <CategoryItem icon={FaGamepad} label="Videojuegos" href="/catalog/gaming" />
-                <CategoryItem icon={FaBook} label="Libros" href="/catalog/books" />
-                <CategoryItem icon={FaBabyCarriage} label="Bebés" href="/catalog/kids" />
-                <CategoryItem icon={FaCar} label="Vehículos" href="/catalog/vehicles" />
-              </SimpleGrid>
+  {Object.entries(getAllCategories()).map(([slug, { label, icon }]) => (
+    <CategoryItem
+      key={slug}
+      icon={icon}
+      label={label}
+      href={`/catalog/${slug}`}
+    />
+  ))}
+</SimpleGrid>
+
             </PopoverContent>
           </Popover>
 
           {/* Search Bar */}
           <InputGroup size="md" maxW="600px" mx={4} flex={1}>
             <InputLeftElement pointerEvents="none">
-              <FaSearch color="gray.300" />
+              <FaSearch color="gray.400" />
             </InputLeftElement>
             <Input
               placeholder="Buscar productos, marcas y más..."
               borderRadius="full"
               bg={searchBgColor}
+              color={searchTextColor}
+              _placeholder={{ color: searchPlaceholderColor }}
               _focus={{
-                borderColor: "brand.primary.400",
-                boxShadow: "0 0 0 1px var(--chakra-colors-brand-primary-400)",
+                borderColor: "brand.secondary.400",
+                boxShadow: "0 0 0 1px var(--chakra-colors-brand-secondary-400)",
               }}
             />
           </InputGroup>
@@ -249,7 +315,13 @@ const Navbar = () => {
           {/* Quick Links */}
           <Popover trigger="hover" placement="bottom-end">
             <PopoverTrigger>
-              <Button rightIcon={<FaChevronDown />} colorScheme="blue" variant="ghost" fontWeight={500}>
+              <Button
+                rightIcon={<FaChevronDown />}
+                variant="ghost"
+                fontWeight={500}
+                color={ghostButtonColor}
+                _hover={{ bg: ghostButtonHoverBg }}
+              >
                 <HStack>
                   <Icon as={FaQuestionCircle} />
                   <Text>Ayuda</Text>
@@ -270,11 +342,13 @@ const Navbar = () => {
                     spacing={3}
                     p={2}
                     rounded="md"
-                    _hover={{ bg: useColorModeValue("brand.primary.50", "gray.700") }}
+                    _hover={{ bg: useColorModeValue("brand.secondary.50", "gray.700") }}
                   >
-                    <Icon as={FaHeadset} color="accent.primary" boxSize={5} />
+                    <Icon as={FaHeadset} color="accent.secondary" boxSize={5} />
                     <Box>
-                      <Text fontWeight={600}>Centro de Ayuda</Text>
+                      <Text fontWeight={600} color="text.primary">
+                        Centro de Ayuda
+                      </Text>
                       <Text fontSize="sm" color="text.secondary">
                         Encuentra soluciones a problemas comunes
                       </Text>
@@ -286,11 +360,13 @@ const Navbar = () => {
                     spacing={3}
                     p={2}
                     rounded="md"
-                    _hover={{ bg: useColorModeValue("brand.primary.50", "gray.700") }}
+                    _hover={{ bg: useColorModeValue("brand.secondary.50", "gray.700") }}
                   >
-                    <Icon as={FaQuestionCircle} color="accent.primary" boxSize={5} />
+                    <Icon as={FaQuestionCircle} color="accent.secondary" boxSize={5} />
                     <Box>
-                      <Text fontWeight={600}>Preguntas Frecuentes</Text>
+                      <Text fontWeight={600} color="text.primary">
+                        Preguntas Frecuentes
+                      </Text>
                       <Text fontSize="sm" color="text.secondary">
                         Respuestas a las dudas más comunes
                       </Text>
@@ -302,11 +378,13 @@ const Navbar = () => {
                     spacing={3}
                     p={2}
                     rounded="md"
-                    _hover={{ bg: useColorModeValue("brand.primary.50", "gray.700") }}
+                    _hover={{ bg: useColorModeValue("brand.secondary.50", "gray.700") }}
                   >
-                    <Icon as={FaHeadset} color="accent.primary" boxSize={5} />
+                    <Icon as={FaHeadset} color="accent.secondary" boxSize={5} />
                     <Box>
-                      <Text fontWeight={600}>Contacto</Text>
+                      <Text fontWeight={600} color="text.primary">
+                        Contacto
+                      </Text>
                       <Text fontSize="sm" color="text.secondary">
                         Comunícate con nuestro equipo
                       </Text>
@@ -322,9 +400,20 @@ const Navbar = () => {
         <Box pb={2} display={{ base: "block", md: "none" }} px={4}>
           <InputGroup>
             <InputLeftElement pointerEvents="none">
-              <FaSearch color="gray.300" />
+              <FaSearch color="gray.400" />
             </InputLeftElement>
-            <Input placeholder="Buscar..." borderRadius="full" size="sm" />
+            <Input 
+              placeholder="Buscar..." 
+              borderRadius="full" 
+              size="sm" 
+              bg={searchBgColor} 
+              color={searchTextColor}
+              _placeholder={{ color: searchPlaceholderColor }}
+              _focus={{
+                borderColor: "brand.secondary.400",
+                boxShadow: "0 0 0 1px var(--chakra-colors-brand-secondary-400)",
+              }}
+            />
           </InputGroup>
         </Box>
 
@@ -337,9 +426,8 @@ const Navbar = () => {
   )
 }
 
-const DesktopNav = () => {
-  const linkColor = useColorModeValue("text.primary", "text.primary")
-  const linkHoverColor = useColorModeValue("accent.primary", "brand.primary.300")
+const DesktopNav = ({ textColor, hoverColor }) => {
+  const linkHoverColor = useColorModeValue("brand.secondary.200", "brand.secondary.300")
   const location = useLocation()
 
   return (
@@ -350,10 +438,11 @@ const DesktopNav = () => {
         to="/"
         fontSize="sm"
         fontWeight={500}
-        color={linkColor}
+        color={textColor}
         _hover={{
           textDecoration: "none",
-          color: linkHoverColor,
+          bg: hoverColor,
+          borderRadius: "md",
         }}
         _activeLink={{
           color: linkHoverColor,
@@ -372,10 +461,11 @@ const DesktopNav = () => {
         to="/about"
         fontSize="sm"
         fontWeight={500}
-        color={linkColor}
+        color={textColor}
         _hover={{
           textDecoration: "none",
-          color: linkHoverColor,
+          bg: hoverColor,
+          borderRadius: "md",
         }}
         _activeLink={{
           color: linkHoverColor,
@@ -401,13 +491,13 @@ const DesktopSubNav = ({ label, href, subLabel, icon }) => {
       display="block"
       p={2}
       rounded="md"
-      _hover={{ bg: useColorModeValue("brand.primary.50", "gray.900") }}
+      _hover={{ bg: useColorModeValue("brand.secondary.50", "gray.700") }}
     >
       <Stack direction="row" align="center">
         <Box>
           <HStack>
-            {icon && <Icon as={icon} color="accent.primary" />}
-            <Text transition="all .3s ease" _groupHover={{ color: "accent.primary" }} fontWeight={500}>
+            {icon && <Icon as={icon} color="accent.secondary" />}
+            <Text transition="all .3s ease" _groupHover={{ color: "accent.secondary" }} fontWeight={500}>
               {label}
             </Text>
           </HStack>
@@ -424,7 +514,7 @@ const DesktopSubNav = ({ label, href, subLabel, icon }) => {
           align="center"
           flex={1}
         >
-          <Icon color="accent.primary" w={5} h={5} as={FaChevronRight} />
+          <Icon color="accent.secondary" w={5} h={5} as={FaChevronRight} />
         </Flex>
       </Stack>
     </Link>
@@ -440,11 +530,11 @@ const CategoryItem = ({ icon, label, href }) => {
       display="block"
       p={2}
       rounded="md"
-      _hover={{ bg: useColorModeValue("brand.primary.50", "gray.900") }}
+      _hover={{ bg: useColorModeValue("brand.secondary.50", "gray.700") }}
     >
       <HStack>
-        <Icon as={icon} color="accent.primary" />
-        <Text>{label}</Text>
+        <Icon as={icon} color="accent.secondary" />
+        <Text color="text.primary">{label}</Text>
       </HStack>
     </Link>
   )
@@ -478,7 +568,17 @@ const MobileNav = () => {
         ]}
       />
       <Box pt={4}>
-        <Button as={RouterLink} to="/login" w="full" colorScheme="blue" leftIcon={<FaSignInAlt />}>
+        <Button
+          as={RouterLink}
+          to="/login"
+          w="full"
+          bg={useColorModeValue("brand.secondary.500", "brand.secondary.600")}
+          color="white"
+          _hover={{
+            bg: useColorModeValue("brand.secondary.600", "brand.secondary.700"),
+          }}
+          leftIcon={<FaSignInAlt />}
+        >
           Ingresar
         </Button>
       </Box>
@@ -502,7 +602,7 @@ const MobileNavItem = ({ label, children, href, icon }) => {
         }}
       >
         <HStack>
-          {icon && <Icon as={icon} color="accent.primary" />}
+          {icon && <Icon as={icon} color="accent.secondary" />}
           <Text fontWeight={600} color={useColorModeValue("text.primary", "text.primary")}>
             {label}
           </Text>
@@ -531,8 +631,8 @@ const MobileNavItem = ({ label, children, href, icon }) => {
             children.map((child) => (
               <Link key={child.label} py={2} as={RouterLink} to={child.href} fontWeight={500}>
                 <HStack>
-                  {child.icon && <Icon as={child.icon} color="accent.primary" />}
-                  <Text>{child.label}</Text>
+                  {child.icon && <Icon as={child.icon} color="accent.secondary" />}
+                  <Text color="text.primary">{child.label}</Text>
                 </HStack>
               </Link>
             ))}

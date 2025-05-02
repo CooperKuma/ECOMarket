@@ -15,7 +15,6 @@ import {
   Image,
   HStack,
   VStack,
-  useColorModeValue,
   useToast,
   Icon,
   Badge,
@@ -42,39 +41,23 @@ const CartPage = () => {
   const [shippingMethod, setShippingMethod] = useState("standard")
   const toast = useToast()
 
-  // Colores según el tema
-  const bgColor = useColorModeValue("white", "gray.800")
-  const borderColor = useColorModeValue("gray.200", "gray.700")
-  const textColor = useColorModeValue("gray.700", "gray.200")
-  const secondaryTextColor = useColorModeValue("gray.600", "gray.400")
-  const buttonColor = useColorModeValue("brand.primary.500", "brand.primary.300")
-  const skeletonBg = useColorModeValue("gray.50", "gray.700")
-
-  // Simular carga de datos
   useEffect(() => {
-    // Simulación de carga de datos del carrito
     setTimeout(() => {
       setCartItems(mockCartItems)
       setLoading(false)
     }, 800)
   }, [])
 
-  // Calcular subtotal
   const subtotal = cartItems.reduce((total, item) => total + item.price * item.quantity, 0)
 
-  // Calcular envío
   const getShippingCost = () => {
     if (subtotal > 50000) return 0
     return shippingMethod === "express" ? 5990 : 3990
   }
 
-  // Calcular impuestos (19% IVA)
   const taxes = subtotal * 0.19
-
-  // Calcular total
   const total = subtotal + getShippingCost() + taxes
 
-  // Manejar cambio de cantidad
   const handleQuantityChange = (id, newQuantity) => {
     if (newQuantity < 1) return
 
@@ -89,7 +72,6 @@ const CartPage = () => {
     })
   }
 
-  // Eliminar producto del carrito
   const handleRemoveItem = (id) => {
     setCartItems(cartItems.filter((item) => item.id !== id))
 
@@ -102,7 +84,6 @@ const CartPage = () => {
     })
   }
 
-  // Aplicar cupón
   const handleApplyCoupon = () => {
     if (!couponCode.trim()) {
       toast({
@@ -116,7 +97,6 @@ const CartPage = () => {
       return
     }
 
-    // Simulación de validación de cupón
     if (couponCode.toUpperCase() === "DESCUENTO20") {
       toast({
         title: "Cupón aplicado",
@@ -138,33 +118,27 @@ const CartPage = () => {
     }
   }
 
-  // Si el carrito está vacío
-  if (!loading && cartItems.length === 0) {
-    return <EmptyCart />
-  }
+  if (!loading && cartItems.length === 0) return <EmptyCart />
 
   return (
     <Container maxW="container.xl" py={8}>
       {/* Breadcrumbs */}
-      <Breadcrumb mb={6} fontSize="sm" color={secondaryTextColor}>
+      <Breadcrumb mb={6} fontSize="sm" color="text.secondary">
         <BreadcrumbItem>
-          <BreadcrumbLink as={RouterLink} to="/">
-            Inicio
-          </BreadcrumbLink>
+          <BreadcrumbLink as={RouterLink} to="/">Inicio</BreadcrumbLink>
         </BreadcrumbItem>
         <BreadcrumbItem isCurrentPage>
           <BreadcrumbLink>Carrito de compras</BreadcrumbLink>
         </BreadcrumbItem>
       </Breadcrumb>
 
-      <Heading as="h1" size="xl" mb={8} color={textColor}>
+      <Heading as="h1" size="xl" mb={8} color="text.primary">
         Tu Carrito de Compras
         <Badge ml={2} colorScheme="green" fontSize="md" borderRadius="full" px={2}>
           {cartItems.length} {cartItems.length === 1 ? "Producto" : "Productos"}
         </Badge>
       </Heading>
 
-      {/* Alerta de envío gratis */}
       {subtotal < 50000 && (
         <Alert status="info" mb={6} borderRadius="md">
           <AlertIcon />
@@ -176,28 +150,30 @@ const CartPage = () => {
       )}
 
       <Grid templateColumns={{ base: "1fr", lg: "2fr 1fr" }} gap={8}>
-        {/* Columna izquierda - Productos */}
+        {/* Columna izquierda */}
         <GridItem>
-          <Box bg={bgColor} p={6} borderRadius="lg" boxShadow="sm" borderWidth="1px" borderColor={borderColor}>
+          <Box bg="bg.card" p={6} borderRadius="lg" boxShadow="sm" borderWidth="1px" borderColor="border.default">
             <Flex justify="space-between" align="center" mb={4}>
-              <Heading as="h2" size="md">
-                Productos
-              </Heading>
-              <Button as={RouterLink} to="/catalog/all" variant="link" leftIcon={<FaArrowLeft />} color={buttonColor}>
+              <Heading as="h2" size="md" color="text.primary">Productos</Heading>
+              <Button
+                as={RouterLink}
+                to="/catalog/all"
+                variant="link"
+                leftIcon={<FaArrowLeft />}
+                color="accent.primary"
+              >
                 Seguir comprando
               </Button>
             </Flex>
 
-            <Divider mb={6} />
+            <Divider mb={6} borderColor="border.default" />
 
-            {/* Lista de productos */}
-            <VStack spacing={6} align="stretch" divider={<Divider />}>
+            <VStack spacing={6} align="stretch" divider={<Divider borderColor="border.default" />}>
               {loading
-                ? // Esqueletos de carga (simplificados para brevedad)
-                  Array(3)
+                ? Array(3)
                     .fill("")
                     .map((_, i) => (
-                      <Box key={i} p={4} bg={skeletonBg} borderRadius="md">
+                      <Box key={i} p={4} bg="bg.surface" borderRadius="md">
                         <Text>Cargando...</Text>
                       </Box>
                     ))
@@ -212,7 +188,6 @@ const CartPage = () => {
             </VStack>
           </Box>
 
-          {/* Opciones de envío */}
           <Box mt={8}>
             <ShippingOptions
               selectedMethod={shippingMethod}
@@ -222,7 +197,7 @@ const CartPage = () => {
           </Box>
         </GridItem>
 
-        {/* Columna derecha - Resumen */}
+        {/* Columna derecha */}
         <GridItem>
           <CartSummary
             subtotal={subtotal}
@@ -234,27 +209,24 @@ const CartPage = () => {
             onApplyCoupon={handleApplyCoupon}
           />
 
-          {/* Métodos de pago aceptados */}
-          <Box mt={6} p={4} bg={bgColor} borderRadius="lg" boxShadow="sm" borderWidth="1px" borderColor={borderColor}>
-            <Heading as="h3" size="sm" mb={3}>
-              Métodos de pago aceptados
-            </Heading>
-            <Flex wrap="wrap" gap={3}>
-              <Image src="/visa.svg" alt="Visa" h="30px" />
-              <Image src="/mastercard.svg" alt="Mastercard" h="30px" />
-              <Image src="/BancoSimpleLogo.svg" alt="BancoSimple" h="20px" />
-              <Image src="/webpay.svg" alt="WebPay" h="30px" />
-            
+          {/* Métodos de pago */}
+          <Box mt={6} p={4} bg="bg.card" borderRadius="lg" boxShadow="sm" borderWidth="1px" borderColor="border.default">
+            <Heading as="h3" size="sm" mb={3} color="text.primary">Métodos de pago aceptados</Heading>
+            <Flex wrap="wrap" gap={3} justify="center">
+              <Image src="/BancoSimpleLogo.svg" alt="BancoSimple" h="40px" />
+              <Image src="/Visa_Brandmark_Blue_RGB_2021.png" alt="Visa" h="30px" />
+              <Image src="/ma_symbol.svg" alt="Mastercard" h="50px" />
+              <Image src="/1.Webpay_FB_800.svg" alt="WebPay" h="40px" />
             </Flex>
           </Box>
 
-          {/* Información de seguridad */}
-          <Box mt={6} p={4} bg={bgColor} borderRadius="lg" boxShadow="sm" borderWidth="1px" borderColor={borderColor}>
+          {/* Seguridad */}
+          <Box mt={6} p={4} bg="bg.card" borderRadius="lg" boxShadow="sm" borderWidth="1px" borderColor="border.default">
             <HStack spacing={3} mb={2}>
               <Icon as={FaLock} color="green.500" />
-              <Text fontWeight="medium">Compra 100% segura</Text>
+              <Text fontWeight="medium" color="text.primary">Compra 100% segura</Text>
             </HStack>
-            <Text fontSize="sm" color={secondaryTextColor}>
+            <Text fontSize="sm" color="text.secondary">
               Tus datos están protegidos y encriptados con los más altos estándares de seguridad.
             </Text>
           </Box>

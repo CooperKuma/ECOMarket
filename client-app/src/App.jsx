@@ -13,6 +13,8 @@ import FaqAccordion from "./modules/support/pages/FaqPage";
 import AboutPage from "./modules/about/pages/AboutPage";
 import CartPage from "./modules/cart/pages/CartPage";
 import RecoveryPasswordpage  from "./modules/auth/pages/RecoveryPasswordPage";
+import SellerStore from "./modules/dashboard/pages/seller/SellerStore";
+
 
 function App() {
   return (
@@ -28,8 +30,9 @@ function App() {
       <Route path="/offers" element={<CatalogPage />} />
       <Route path="/support/faq" element={<FaqAccordion />} />
       <Route path="/about" element={<AboutPage />} />
-      
-    </Route>
+      <Route path="/seller/:id" element={<SellerStore />} />
+    
+            </Route>
 
     {/* Dashboard: layout independiente */}
     <Route path="/dashboard/*" element={<Dashboard />} />

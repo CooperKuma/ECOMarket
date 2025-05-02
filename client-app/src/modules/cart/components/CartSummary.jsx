@@ -18,12 +18,13 @@ import {
 import { FaInfoCircle, FaLock, FaChevronRight } from "react-icons/fa"
 
 const CartSummary = ({ subtotal, shipping, taxes, total, couponCode, setCouponCode, onApplyCoupon }) => {
-  // Colores según el tema
-  const bgColor = useColorModeValue("white", "gray.800")
-  const borderColor = useColorModeValue("gray.200", "gray.700")
-  const textColor = useColorModeValue("gray.700", "gray.200")
-  const secondaryTextColor = useColorModeValue("gray.600", "gray.400")
-  const accentColor = useColorModeValue("brand.primary.500", "brand.primary.300")
+  // Usando tokens semánticos del theme
+  const bgColor = "bg.card"
+  const borderColor = "border.default"
+  const textColor = "text.primary"
+  const secondaryTextColor = "text.secondary"
+  const accentColor = "accent.primary"
+  const accentSecondary = "accent.secondary"
 
   return (
     <Box
@@ -88,7 +89,7 @@ const CartSummary = ({ subtotal, shipping, taxes, total, couponCode, setCouponCo
 
         <Flex justify="space-between" fontWeight="bold" fontSize="lg">
           <Text>Total</Text>
-          <Text color={accentColor}>${total.toLocaleString()}</Text>
+          <Text color="accent.primary">${total.toLocaleString()}</Text>
         </Flex>
 
         {/* Cupón de descuento */}
@@ -104,7 +105,14 @@ const CartSummary = ({ subtotal, shipping, taxes, total, couponCode, setCouponCo
               onChange={(e) => setCouponCode(e.target.value)}
             />
             <InputRightElement width="4.5rem">
-              <Button h="1.75rem" size="sm" onClick={onApplyCoupon}>
+              <Button
+                h="1.75rem"
+                size="sm"
+                bg={useColorModeValue("brand.secondary.700", "brand.secondary.600")}
+                color="white"
+                _hover={{ bg: useColorModeValue("brand.secondary.800", "brand.secondary.500") }}
+                onClick={onApplyCoupon}
+              >
                 Aplicar
               </Button>
             </InputRightElement>
@@ -115,17 +123,22 @@ const CartSummary = ({ subtotal, shipping, taxes, total, couponCode, setCouponCo
         <Button
           mt={6}
           size="lg"
-          colorScheme="green"
+          bg="accent.primary"
+          color="white"
+          _hover={{
+            bg: useColorModeValue("brand.primary.600", "brand.primary.400"),
+            transform: "translateY(-2px)",
+            boxShadow: "lg",
+          }}
           rightIcon={<FaChevronRight />}
           w="100%"
-          _hover={{ transform: "translateY(-2px)", boxShadow: "lg" }}
           transition="all 0.2s"
         >
           Proceder al pago
         </Button>
 
         <Flex align="center" justify="center" mt={2}>
-          <Icon as={FaLock} color="green.500" mr={1} />
+          <Icon as={FaLock} color="accent.primary" mr={1} />
           <Text fontSize="xs" color={secondaryTextColor}>
             Pago 100% seguro
           </Text>

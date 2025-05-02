@@ -4,17 +4,23 @@ import { Box, Heading, RadioGroup, Radio, Stack, Flex, Text, Icon, useColorModeV
 import { FaTruck, FaBolt, FaMapMarkerAlt } from "react-icons/fa"
 
 const ShippingOptions = ({ selectedMethod, onSelectMethod, freeShippingEligible }) => {
-  // Colores según el tema
-  const bgColor = useColorModeValue("white", "gray.800")
-  const borderColor = useColorModeValue("gray.200", "gray.700")
-  const textColor = useColorModeValue("gray.700", "gray.200")
-  const secondaryTextColor = useColorModeValue("gray.600", "gray.400")
-  const highlightBg = useColorModeValue("green.50", "green.900")
-  const highlightBorder = useColorModeValue("green.200", "green.700")
+  // Colores según el tema usando tokens semánticos
+  const bgColor = useColorModeValue("bg.card", "bg.card")
+  const borderColor = useColorModeValue("border.default", "border.default")
+  const textColor = useColorModeValue("text.primary", "text.primary")
+  const secondaryTextColor = useColorModeValue("text.secondary", "text.secondary")
+  const highlightBg = useColorModeValue("brand.primary.50", "rgba(77, 136, 202, 0.15)")
+  const highlightBorder = useColorModeValue("brand.primary.200", "brand.primary.700")
+  const standardIconColor = useColorModeValue("brand.primary.500", "brand.primary.300")
+  const expressIconColor = useColorModeValue("brand.secondary.500", "brand.secondary.300")
+  const pickupIconColor = useColorModeValue("brand.primary.600", "brand.primary.400")
+  const badgeColor = useColorModeValue("brand.secondary", "brand.secondary")
+  const badgeBgColor = useColorModeValue("brand.secondary.100", "brand.secondary.900")
+  const badgeTextColor = useColorModeValue("brand.secondary.800", "brand.secondary.100")
 
   return (
     <Box bg={bgColor} p={6} borderRadius="lg" boxShadow="sm" borderWidth="1px" borderColor={borderColor}>
-      <Heading as="h2" size="md" mb={4}>
+      <Heading as="h2" size="md" mb={4} color={textColor}>
         Opciones de envío
       </Heading>
 
@@ -27,13 +33,16 @@ const ShippingOptions = ({ selectedMethod, onSelectMethod, freeShippingEligible 
             borderRadius="md"
             borderColor={selectedMethod === "standard" ? highlightBorder : borderColor}
             bg={selectedMethod === "standard" ? highlightBg : "transparent"}
+            transition="all 0.2s"
           >
-            <Radio value="standard" colorScheme="green">
+            <Radio value="standard" colorScheme="brand">
               <Flex align="center" wrap="wrap">
-                <Icon as={FaTruck} mr={2} />
-                <Text fontWeight="medium">Envío estándar</Text>
+                <Icon as={FaTruck} mr={2} color={standardIconColor} />
+                <Text fontWeight="medium" color={textColor}>
+                  Envío estándar
+                </Text>
                 {freeShippingEligible && (
-                  <Badge colorScheme="green" ml={2}>
+                  <Badge colorScheme={badgeColor} ml={2} bg={badgeBgColor} color={badgeTextColor}>
                     GRATIS
                   </Badge>
                 )}
@@ -43,7 +52,7 @@ const ShippingOptions = ({ selectedMethod, onSelectMethod, freeShippingEligible 
               Entrega estimada: 3-5 días hábiles
             </Text>
             {!freeShippingEligible && (
-              <Text fontWeight="medium" mt={1} ml={6}>
+              <Text fontWeight="medium" mt={1} ml={6} color={textColor}>
                 $3.990
               </Text>
             )}
@@ -56,17 +65,20 @@ const ShippingOptions = ({ selectedMethod, onSelectMethod, freeShippingEligible 
             borderRadius="md"
             borderColor={selectedMethod === "express" ? highlightBorder : borderColor}
             bg={selectedMethod === "express" ? highlightBg : "transparent"}
+            transition="all 0.2s"
           >
-            <Radio value="express" colorScheme="green">
+            <Radio value="express" colorScheme="brand">
               <Flex align="center">
-                <Icon as={FaBolt} mr={2} />
-                <Text fontWeight="medium">Envío express</Text>
+                <Icon as={FaBolt} mr={2} color={expressIconColor} />
+                <Text fontWeight="medium" color={textColor}>
+                  Envío express
+                </Text>
               </Flex>
             </Radio>
             <Text fontSize="sm" color={secondaryTextColor} mt={2} ml={6}>
               Entrega estimada: 24-48 horas (días hábiles)
             </Text>
-            <Text fontWeight="medium" mt={1} ml={6}>
+            <Text fontWeight="medium" mt={1} ml={6} color={textColor}>
               {freeShippingEligible ? "$1.990" : "$5.990"}
             </Text>
           </Box>
@@ -78,12 +90,15 @@ const ShippingOptions = ({ selectedMethod, onSelectMethod, freeShippingEligible 
             borderRadius="md"
             borderColor={selectedMethod === "pickup" ? highlightBorder : borderColor}
             bg={selectedMethod === "pickup" ? highlightBg : "transparent"}
+            transition="all 0.2s"
           >
-            <Radio value="pickup" colorScheme="green">
+            <Radio value="pickup" colorScheme="brand">
               <Flex align="center">
-                <Icon as={FaMapMarkerAlt} mr={2} />
-                <Text fontWeight="medium">Retiro en tienda</Text>
-                <Badge colorScheme="green" ml={2}>
+                <Icon as={FaMapMarkerAlt} mr={2} color={pickupIconColor} />
+                <Text fontWeight="medium" color={textColor}>
+                  Retiro en tienda
+                </Text>
+                <Badge colorScheme={badgeColor} ml={2} bg={badgeBgColor} color={badgeTextColor}>
                   GRATIS
                 </Badge>
               </Flex>
